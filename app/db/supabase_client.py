@@ -86,6 +86,10 @@ async def select_code_artifact_by_id(record_id: str) -> Any:
     return await code_artifacts.select_by_id(record_id)
 
 
+async def select_code_artifact_by_field(field_name: str, value: Any) -> Any:
+    return await code_artifacts.select_by_field(field_name, value)
+
+
 async def update_code_artifact_by_id(record_id: str, payload: dict[str, Any]) -> Any:
     return await code_artifacts.update_by_id(record_id, payload)
 
@@ -96,6 +100,10 @@ async def insert_deployment(payload: dict[str, Any]) -> Any:
 
 async def select_deployment_by_id(record_id: str) -> Any:
     return await deployments.select_by_id(record_id)
+
+
+async def select_deployment_by_field(field_name: str, value: Any) -> Any:
+    return await deployments.select_by_field(field_name, value)
 
 
 async def update_deployment_by_id(record_id: str, payload: dict[str, Any]) -> Any:

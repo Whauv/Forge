@@ -10,3 +10,4 @@ PyGithub
 firecrawl-py
 python-dotenv
 httpx
+patch

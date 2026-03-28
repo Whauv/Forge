@@ -13,10 +13,12 @@ from app.core.json_stream import (
     extract_nullable_string_field,
     extract_string_field,
 )
-from app.db.qdrant_client import search_vectors
+from app.db.qdrant_client import search_vectors, search_vectors_in_collection
 from app.db.supabase_client import insert_task
 
 ANALYSIS_PROMPT = """You are a senior Forward Deployed Engineer embedded at a client site.
+
+{similar_template}
 
 Client's codebase context:
 {retrieved_chunks}
@@ -89,9 +91,11 @@ class AnalysisAgent:
 
     async def _build_prompt(self, project_id: str, user_query: str) -> str:
         query_vector = await self._embed_query(user_query)
+        similar_template = await self._find_similar_template(query_vector)
         matches = await search_vectors(project_id, query_vector, limit=10)
         retrieved_chunks = self._format_retrieved_chunks(matches)
         return ANALYSIS_PROMPT.format(
+            similar_template=similar_template,
             retrieved_chunks=retrieved_chunks,
             user_query=user_query,
         )
@@ -109,6 +113,26 @@ class AnalysisAgent:
             return embedding
 
         return await asyncio.to_thread(_embed)
+
+    async def _find_similar_template(self, query_vector: list[float]) -> str:
+        try:
+            matches = await search_vectors_in_collection(
+                "solution_templates",
+                query_vector,
+                limit=1,
+                score_threshold=0.85,
+            )
+        except Exception:
+            return ""
+
+        if not matches:
+            return ""
+
+        payload = getattr(matches[0], "payload", {}) or {}
+        return (
+            "Here is a similar solved problem for reference: "
+            f"{json.dumps(payload, indent=2)}\n"
+        )
 
     def _format_retrieved_chunks(self, matches: list[Any]) -> str:
         formatted_chunks: list[str] = []
