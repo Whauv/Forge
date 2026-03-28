@@ -65,7 +65,10 @@ async def run(payload: RunRequest) -> dict[str, Any]:
         tester_result = await TesterAgent().run(coder_result)
 
         task_status = "completed" if tester_result["status"] == "passed" else "needs_human_review"
-        await update_task_by_id(task["id"], {"status": task_status})
+        await update_task_by_id(
+            task["id"],
+            {"status": task_status, "test_result": tester_result},
+        )
         await broadcast_project_update(
             payload.project_id,
             "run_status",
