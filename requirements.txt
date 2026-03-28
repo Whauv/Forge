@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+supabase
+qdrant-client
+google-generativeai
+langgraph
+langchain
+e2b-code-interpreter
+PyGithub
+firecrawl-py
+python-dotenv
+httpx
