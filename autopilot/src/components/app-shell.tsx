@@ -15,7 +15,7 @@ type AppShellProps = {
 };
 
 const navItems = [
-  { href: "/", label: "Projects" },
+  { href: "/projects", label: "Projects" },
   { href: "/run-console", label: "Run Console" },
   { href: "/history", label: "History" },
 ];
@@ -57,7 +57,9 @@ export function AppShell({ children, user }: AppShellProps) {
 
           <nav className="mt-10 flex flex-col gap-2">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/" && pathname.startsWith(`${item.href}/`));
               return (
                 <Link
                   key={item.href}
