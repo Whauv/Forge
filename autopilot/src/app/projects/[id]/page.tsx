@@ -41,6 +41,12 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
         >
           Review artifacts
         </Link>
+        <Link
+          href={`/projects/${params.id}/deployment`}
+          className="rounded-full border border-line px-5 py-3 text-sm font-semibold transition hover:border-accent hover:text-accent"
+        >
+          Deployment status
+        </Link>
       </div>
     </main>
   );

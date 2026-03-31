@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { sendPRCreatedEmail } from "@/lib/email";
 import { createRouteHandlerSupabaseClient } from "@/lib/supabase";
 
 type ProceedRouteProps = {
@@ -21,7 +22,7 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
 
     const { data: deployment, error: fetchError } = await supabase
       .from("deployments")
-      .select("id,status")
+      .select("id,status,pr_link,project_id")
       .eq("id", params.deploymentId)
       .single();
 
@@ -46,6 +47,10 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    if (deployment.pr_link && session.user.email) {
+      await sendPRCreatedEmail(session.user.email, deployment.pr_link);
     }
 
     return NextResponse.json({ status: "deployed" });
