@@ -15,8 +15,11 @@ export async function POST(request: Request) {
   });
 
   if (error || !data.url) {
-    return NextResponse.redirect(new URL("/login?error=oauth_start_failed", url.origin));
+    return NextResponse.redirect(
+      new URL("/login?error=oauth_start_failed", url.origin),
+      { status: 303 },
+    );
   }
 
-  return NextResponse.redirect(data.url);
+  return NextResponse.redirect(data.url, { status: 303 });
 }
