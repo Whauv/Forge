@@ -2,14 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-type DeploymentRecord = {
-  id: string;
-  status: string | null;
-};
+import type { DeploymentRow } from "@/types/db";
 
 type ApproveProceedButtonProps = {
-  deployment: DeploymentRecord | null;
+  deployment: Pick<DeploymentRow, "id" | "status"> | null;
 };
 
 export function ApproveProceedButton({ deployment }: ApproveProceedButtonProps) {

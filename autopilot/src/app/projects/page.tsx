@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createServerSupabaseClient } from "@/lib/supabase";
+import type { ProjectRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,8 @@ export default async function ProjectsPage() {
     .from("projects")
     .select("*")
     .eq("user_id", session.user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .returns<ProjectRow[]>();
 
   if (error) {
     throw new Error(error.message);

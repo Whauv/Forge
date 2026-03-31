@@ -2,17 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-
-type Task = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string | null;
-  clarifying_question: string | null;
-};
+import type { TaskRow } from "@/types/db";
 
 type TaskGraphProps = {
-  tasks: Task[];
+  tasks: TaskRow[];
 };
 
 export function TaskGraph({ tasks }: TaskGraphProps) {

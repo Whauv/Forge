@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createRouteHandlerSupabaseClient } from "@/lib/supabase";
+import type { ProjectRow } from "@/types/db";
 
 type IngestPayload = {
   name?: string;
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
         problem_description: problemDescription,
       })
       .select("id")
+      .returns<Pick<ProjectRow, "id">[]>()
       .single();
 
     if (error || !data) {

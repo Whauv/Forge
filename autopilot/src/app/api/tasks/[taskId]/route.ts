@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { createRouteHandlerSupabaseClient } from "@/lib/supabase";
+import type { TaskStatus } from "@/types/db";
 
 type PatchPayload = {
-  status?: "approved" | "rejected";
+  status?: Extract<TaskStatus, "approved" | "rejected">;
 };
 
 type TaskPatchRouteProps = {

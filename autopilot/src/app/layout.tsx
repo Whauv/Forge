@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
+import { Providers } from "@/components/providers";
+import { validateAppEnv } from "@/lib/env";
 import { createServerSupabaseClient } from "@/lib/supabase";
 import "./globals.css";
 
@@ -27,6 +29,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  validateAppEnv();
   const supabase = createServerSupabaseClient();
   const {
     data: { session },
@@ -45,10 +48,13 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${robotoMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <AppShell user={user}>{children}</AppShell>
+        <Providers>
+          <AppShell user={user}>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );

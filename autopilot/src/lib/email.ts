@@ -1,21 +1,17 @@
 import { Resend } from "resend";
-
-const resendApiKey = process.env.RESEND_API_KEY;
-const senderEmail = process.env.RESEND_FROM_EMAIL ?? "AutoPilot <onboarding@resend.dev>";
+import { getServerEnv } from "@/lib/env";
 
 function getResendClient() {
-  if (!resendApiKey) {
-    throw new Error("Missing RESEND_API_KEY environment variable.");
-  }
-
-  return new Resend(resendApiKey);
+  const { RESEND_API_KEY } = getServerEnv();
+  return new Resend(RESEND_API_KEY);
 }
 
 export async function sendPRCreatedEmail(to: string, prLink: string) {
   const resend = getResendClient();
+  const { RESEND_FROM_EMAIL } = getServerEnv();
 
   await resend.emails.send({
-    from: senderEmail,
+    from: RESEND_FROM_EMAIL,
     to,
     subject: "AutoPilot created a pull request",
     html: `

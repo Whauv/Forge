@@ -1,5 +1,6 @@
 import { TaskGraph } from "@/components/task-graph";
 import { createServerSupabaseClient } from "@/lib/supabase";
+import type { TaskRow } from "@/types/db";
 
 type ProjectTasksPageProps = {
   params: {
@@ -16,7 +17,8 @@ export default async function ProjectTasksPage({ params }: ProjectTasksPageProps
     .from("tasks")
     .select("*")
     .eq("project_id", params.id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .returns<TaskRow[]>();
 
   if (error) {
     throw new Error(error.message);
