@@ -1,11 +1,9 @@
 "use client";
 
-type DeploymentRecord = {
-  test_output: string | null;
-};
+import type { DeploymentRow } from "@/types/db";
 
 type TestOutputLogProps = {
-  deployment: DeploymentRecord | null;
+  deployment: Pick<DeploymentRow, "test_output"> | null;
 };
 
 export function TestOutputLog({ deployment }: TestOutputLogProps) {

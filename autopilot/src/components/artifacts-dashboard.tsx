@@ -2,35 +2,25 @@
 
 import { useEffect, useMemo, useState } from "react";
 import DiffViewer from "react-diff-viewer";
+import { useTheme } from "next-themes";
 
 import { ApproveProceedButton } from "@/components/approve-proceed-button";
 import { PipelineStatusBar } from "@/components/pipeline-status-bar";
 import { TestOutputLog } from "@/components/test-output-log";
 import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
+import type { CodeArtifactRow, DeploymentRow } from "@/types/db";
 
-type ArtifactRecord = {
-  id: string;
-  file_path: string;
-  unified_diff: string;
+type ArtifactRecord = Pick<CodeArtifactRow, "id" | "file_path" | "unified_diff"> & {
   task: {
     title: string | null;
     description: string | null;
   } | null;
 };
 
-type DeploymentRecord = {
-  id: string;
-  project_id: string;
-  status: string | null;
-  retry_count: number | null;
-  test_output: string | null;
-  created_at: string;
-};
-
 type ArtifactsDashboardProps = {
   projectId: string;
   artifacts: ArtifactRecord[];
-  initialDeployments: DeploymentRecord[];
+  initialDeployments: DeploymentRow[];
 };
 
 function parseUnifiedDiff(diff: string) {
@@ -75,7 +65,8 @@ export function ArtifactsDashboard({
   artifacts,
   initialDeployments,
 }: ArtifactsDashboardProps) {
-  const [deployments, setDeployments] = useState<DeploymentRecord[]>(initialDeployments);
+  const { resolvedTheme } = useTheme();
+  const [deployments, setDeployments] = useState<DeploymentRow[]>(initialDeployments);
 
   const latestDeployment = useMemo(() => {
     return [...deployments].sort((a, b) =>
@@ -97,7 +88,7 @@ export function ArtifactsDashboard({
         },
         (payload) => {
           setDeployments((current) => {
-            const incoming = payload.new as DeploymentRecord;
+            const incoming = payload.new as DeploymentRow;
             const existingIndex = current.findIndex((item) => item.id === incoming.id);
             if (existingIndex >= 0) {
               const next = [...current];
@@ -162,7 +153,7 @@ export function ArtifactsDashboard({
                     oldValue={parsed.oldValue}
                     newValue={parsed.newValue}
                     splitView
-                    useDarkTheme={false}
+                    useDarkTheme={resolvedTheme === "dark"}
                     hideLineNumbers={false}
                     showDiffOnly={false}
                   />

@@ -1,6 +1,14 @@
 import { redirect } from "next/navigation";
 
 import { createServerSupabaseClient } from "@/lib/supabase";
+import type { DeploymentRow } from "@/types/db";
+
+type HistoryDeployment = Pick<
+  DeploymentRow,
+  "id" | "status" | "pr_link" | "branch_name" | "commit_sha" | "created_at"
+> & {
+  project: { name?: string; user_id?: string } | { name?: string; user_id?: string }[] | null;
+};
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +28,7 @@ function statusClasses(status: string | null) {
   }
 }
 
-function getProjectName(project: { name?: string } | { name?: string }[] | null) {
+function getProjectName(project: HistoryDeployment["project"]) {
   if (Array.isArray(project)) {
     return project[0]?.name ?? "Unknown project";
   }
@@ -41,7 +49,8 @@ export default async function HistoryPage() {
     .from("deployments")
     .select("id,status,pr_link,branch_name,commit_sha,created_at,project:projects(name,user_id)")
     .eq("project.user_id", session.user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .returns<HistoryDeployment[]>();
 
   if (error) {
     throw new Error(error.message);
@@ -102,14 +111,14 @@ export default async function HistoryPage() {
                           {deployment.pr_link}
                         </a>
                       ) : (
-                        "—"
+                        "-"
                       )}
                     </td>
                     <td className="px-5 py-4 break-all text-muted">
-                      {deployment.branch_name ?? "—"}
+                      {deployment.branch_name ?? "-"}
                     </td>
                     <td className="px-5 py-4 break-all font-mono text-xs text-muted">
-                      {deployment.commit_sha ?? "—"}
+                      {deployment.commit_sha ?? "-"}
                     </td>
                     <td className="px-5 py-4 text-muted">
                       {new Date(deployment.created_at).toLocaleString()}

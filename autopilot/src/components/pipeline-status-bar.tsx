@@ -1,13 +1,9 @@
 "use client";
 
-type DeploymentRecord = {
-  id: string;
-  status: string | null;
-  retry_count: number | null;
-};
+import type { DeploymentRow } from "@/types/db";
 
 type PipelineStatusBarProps = {
-  deployment: DeploymentRecord | null;
+  deployment: Pick<DeploymentRow, "id" | "status" | "retry_count"> | null;
 };
 
 const steps = [

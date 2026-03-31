@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { sendPRCreatedEmail } from "@/lib/email";
 import { createRouteHandlerSupabaseClient } from "@/lib/supabase";
+import type { DeploymentRow } from "@/types/db";
 
 type ProceedRouteProps = {
   params: {
@@ -24,6 +25,7 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
       .from("deployments")
       .select("id,status,pr_link,project_id")
       .eq("id", params.deploymentId)
+      .returns<Pick<DeploymentRow, "id" | "status" | "pr_link" | "project_id">[]>()
       .single();
 
     if (fetchError || !deployment) {

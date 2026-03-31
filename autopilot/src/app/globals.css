@@ -55,6 +55,10 @@ button {
   cursor: pointer;
 }
 
+summary::-webkit-details-marker {
+  display: none;
+}
+
 @keyframes autopilot-progress {
   0% {
     transform: translateX(-35%);

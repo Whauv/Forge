@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { createServerSupabaseClient } from "@/lib/supabase";
+import type { DeploymentRow } from "@/types/db";
 
 type ProjectDeploymentPageProps = {
   params: {
@@ -28,6 +29,7 @@ export default async function ProjectDeploymentPage({
     .eq("project_id", params.id)
     .order("created_at", { ascending: false })
     .limit(1)
+    .returns<DeploymentRow[]>()
     .maybeSingle();
 
   if (error) {
