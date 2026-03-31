@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 
 import {
-  createClientComponentClient,
   createMiddlewareClient,
   createRouteHandlerClient,
   createServerComponentClient,
@@ -18,11 +17,6 @@ function assertSupabaseEnv() {
     );
   }
 }
-
-export const createBrowserSupabaseClient = () => {
-  assertSupabaseEnv();
-  return createClientComponentClient();
-};
 
 export const createServerSupabaseClient = () => {
   assertSupabaseEnv();

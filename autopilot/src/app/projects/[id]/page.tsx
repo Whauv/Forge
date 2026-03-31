@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type ProjectDetailPageProps = {
   params: {
     id: string;
@@ -20,6 +22,26 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
         This route is in place so project cards have a working destination. In the next
         phase, it can host ingest progress, generated tasks, diffs, and deployment state.
       </p>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link
+          href={`/projects/${params.id}/analyze`}
+          className="rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong"
+        >
+          Analyze project
+        </Link>
+        <Link
+          href={`/projects/${params.id}/tasks`}
+          className="rounded-full border border-line px-5 py-3 text-sm font-semibold transition hover:border-accent hover:text-accent"
+        >
+          View tasks
+        </Link>
+        <Link
+          href={`/projects/${params.id}/artifacts`}
+          className="rounded-full border border-line px-5 py-3 text-sm font-semibold transition hover:border-accent hover:text-accent"
+        >
+          Review artifacts
+        </Link>
+      </div>
     </main>
   );
 }
