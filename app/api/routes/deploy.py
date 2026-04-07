@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.agents.deploy_agent import DeployAgent
 from app.agents.feedback_agent import FeedbackAgent
+from app.core.repo_utils import normalize_code_artifact_rows
 from app.db.supabase_client import (
     select_code_artifact_by_field,
     select_project_by_id,
@@ -33,7 +34,7 @@ async def deploy(payload: DeployRequest) -> dict[str, Any]:
         project = project_rows[0]
 
         approved_diffs_rows = getattr(
-            await select_code_artifact_by_field("task_id", task.get("task_id") or task.get("id")),
+            await select_code_artifact_by_field("task_id", task.get("id")),
             "data",
             None,
         ) or []
@@ -45,9 +46,9 @@ async def deploy(payload: DeployRequest) -> dict[str, Any]:
         deploy_result = await DeployAgent().run(
             {
                 "project_id": payload.project_id,
-                "repo_url": project.get("repo_url"),
-                "approved_diffs": approved_diffs,
-                "task_id": task.get("task_id") or task.get("id"),
+                "repo_url": project.get("github_repo_url"),
+                "approved_diffs": normalize_code_artifact_rows(approved_diffs),
+                "task_id": task.get("id"),
                 "task_title": task.get("title") or "AI-FDE deployment",
                 "pain_points": (analysis or {}).get("pain_points"),
                 "proposed_solution": (analysis or {}).get("proposed_solution"),

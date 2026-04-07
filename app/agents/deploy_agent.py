@@ -6,6 +6,7 @@ import patch
 from github import Github
 
 from app.core.config import get_required_env
+from app.core.repo_utils import parse_github_repo_name
 from app.db.supabase_client import insert_deployment
 
 
@@ -16,7 +17,10 @@ class DeployAgent:
     async def run(self, payload: dict[str, Any]) -> dict[str, Any]:
         try:
             project_id = payload["project_id"]
-            repo = await asyncio.to_thread(self.github_client.get_repo, self._parse_repo_name(payload["repo_url"]))
+            repo_url = payload.get("repo_url")
+            if not repo_url:
+                raise ValueError("repo_url is required for deployment.")
+            repo = await asyncio.to_thread(self.github_client.get_repo, parse_github_repo_name(repo_url))
             branch_name = f"ai-fde/{project_id[:8]}"
             base_branch = await asyncio.to_thread(repo.get_branch, "main")
             await self._ensure_branch(repo, branch_name, base_branch.commit.sha)
@@ -48,10 +52,10 @@ class DeployAgent:
                     "id": str(uuid4()),
                     "project_id": project_id,
                     "task_id": payload.get("task_id"),
-                    "pr_url": pr.html_url,
-                    "branch": branch_name,
+                    "pr_link": pr.html_url,
+                    "branch_name": branch_name,
                     "commit_sha": commit_sha,
-                    "status": "opened",
+                    "status": "deployed",
                 }
             )
             return result
@@ -162,12 +166,3 @@ class DeployAgent:
             "## Test Results Summary\n"
             f"{test_summary}\n"
         )
-
-    def _parse_repo_name(self, repo_url: str) -> str:
-        path = repo_url.split("github.com/")[-1].strip("/")
-        if path.endswith(".git"):
-            path = path[:-4]
-        parts = [part for part in path.split("/") if part]
-        if len(parts) < 2:
-            raise ValueError("repo_url must point to a valid GitHub repository.")
-        return "/".join(parts[:2])

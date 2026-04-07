@@ -113,7 +113,7 @@ async def broadcast_project_update(
     event: str,
     payload: dict[str, Any],
 ) -> None:
-    broadcast_url = f"{SUPABASE_URL.rstrip('/')}/realtime/v1/api/broadcast"
+    broadcast_url = f"{settings.supabase_url.rstrip('/')}/realtime/v1/api/broadcast"
     message = {
         "messages": [
             {
@@ -124,8 +124,8 @@ async def broadcast_project_update(
         ]
     }
     headers = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "apikey": settings.supabase_key,
+        "Authorization": f"Bearer {settings.supabase_key}",
         "Content-Type": "application/json",
     }
 

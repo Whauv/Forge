@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class StatusResponse(BaseModel):
@@ -9,7 +9,7 @@ class StatusResponse(BaseModel):
 class IngestRequest(BaseModel):
     project_id: str | None = None
     repo_url: HttpUrl | None = None
-    doc_urls: list[HttpUrl] = []
+    doc_urls: list[HttpUrl] = Field(default_factory=list)
     raw_text: str | None = None
 
 
@@ -26,4 +26,3 @@ class RunRequest(BaseModel):
 class DeployRequest(BaseModel):
     project_id: str
     task_id: str
-

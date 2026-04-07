@@ -157,9 +157,9 @@ class CoderAgent:
                 {
                     "id": str(uuid4()),
                     "project_id": project_id,
-                    "task_id": task.get("task_id") or task.get("id"),
+                    "task_id": task.get("id"),
                     "file_path": diff["file_path"],
-                    "diff": diff["diff"],
+                    "unified_diff": diff["diff"],
                     "explanation": diff["explanation"],
                     "status": "generated",
                 }

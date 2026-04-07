@@ -118,7 +118,7 @@ from pathlib import Path
 
 workspace = Path("/home/user/project")
 workspace.mkdir(parents=True, exist_ok=True)
-repo_url = {json.dumps(project.get("repo_url"))}
+repo_url = {json.dumps(project.get("github_repo_url"))}
 github_token = {json.dumps(github_token)}
 diffs = {json.dumps(diffs)}
 

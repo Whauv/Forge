@@ -119,8 +119,9 @@ class ArchitectAgent:
                     "task_id": task["task_id"],
                     "title": task["title"],
                     "description": task["description"],
-                    "files_to_modify": task["files_to_modify"],
-                    "depends_on": task["depends_on"],
-                    "type": task["type"],
+                    "clarifying_question": None,
+                    "files_to_modify": task.get("files_to_modify", []),
+                    "depends_on": task.get("depends_on", []),
+                    "type": task.get("type", "modify"),
                 }
             )
