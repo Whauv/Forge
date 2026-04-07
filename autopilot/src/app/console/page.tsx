@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { RunConsoleDashboard } from "@/components/run-console-dashboard";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { requireServerSessionOrRedirect } from "@/lib/server-access";
 import type { DeploymentRow, ProjectRow, TaskRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
@@ -11,14 +11,7 @@ type ArtifactProjectRef = {
 };
 
 export default async function ConsolePage() {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
+  const { supabase, session } = await requireServerSessionOrRedirect();
 
   const { data: projects, error: projectsError } = await supabase
     .from("projects")

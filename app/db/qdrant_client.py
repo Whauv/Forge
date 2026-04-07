@@ -4,12 +4,13 @@ from typing import Any, Sequence
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, PointStruct, VectorParams
 
-from app.core.config import get_required_env
+from app.core.config import get_settings
 
-QDRANT_URL = get_required_env("QDRANT_URL")
-QDRANT_API_KEY = get_required_env("QDRANT_API_KEY")
-
-qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+settings = get_settings()
+qdrant_client = QdrantClient(
+    url=settings.qdrant_url,
+    api_key=settings.qdrant_api_key,
+)
 
 
 def _collection_name(project_id: str) -> str:

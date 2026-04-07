@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { ArtifactsDashboard } from "@/components/artifacts-dashboard";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { requireOwnedProjectOrRedirect } from "@/lib/server-access";
 import type { CodeArtifactRow, DeploymentRow } from "@/types/db";
 
 type ProjectArtifactsPageProps = {
@@ -22,14 +22,7 @@ type ArtifactWithTask = Pick<CodeArtifactRow, "id" | "file_path" | "unified_diff
 export default async function ProjectArtifactsPage({
   params,
 }: ProjectArtifactsPageProps) {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
+  const { supabase } = await requireOwnedProjectOrRedirect(params.id);
 
   const { data: artifacts, error: artifactError } = await supabase
     .from("code_artifacts")

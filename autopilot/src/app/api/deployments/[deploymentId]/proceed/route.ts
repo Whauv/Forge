@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendPRCreatedEmail } from "@/lib/email";
-import { createRouteHandlerSupabaseClient } from "@/lib/supabase";
+import { requireRouteSession } from "@/lib/server-access";
 import type { DeploymentRow } from "@/types/db";
 
 type ProceedRouteProps = {
@@ -12,21 +12,23 @@ type ProceedRouteProps = {
 
 export async function POST(request: Request, { params }: ProceedRouteProps) {
   try {
-    const supabase = createRouteHandlerSupabaseClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    const auth = await requireRouteSession();
+    if ("response" in auth) {
+      return auth.response;
     }
 
+    const { supabase, userId } = auth;
     const { data: deployment, error: fetchError } = await supabase
       .from("deployments")
-      .select("id,status,pr_link,project_id")
+      .select("id,status,pr_link,project_id,project:projects!inner(user_id)")
       .eq("id", params.deploymentId)
-      .returns<Pick<DeploymentRow, "id" | "status" | "pr_link" | "project_id">[]>()
-      .single();
+      .eq("project.user_id", userId)
+      .returns<
+        (Pick<DeploymentRow, "id" | "status" | "pr_link" | "project_id"> & {
+          project: { user_id?: string } | { user_id?: string }[] | null;
+        })[]
+      >()
+      .maybeSingle();
 
     if (fetchError || !deployment) {
       return NextResponse.json(
@@ -51,7 +53,11 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
-    if (deployment.pr_link && session.user.email) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (deployment.pr_link && session?.user.email) {
       await sendPRCreatedEmail(session.user.email, deployment.pr_link);
     }
 

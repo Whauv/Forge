@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { requireServerSessionOrRedirect } from "@/lib/server-access";
 import type { DeploymentRow } from "@/types/db";
 
 type HistoryDeployment = Pick<
@@ -36,14 +36,7 @@ function getProjectName(project: HistoryDeployment["project"]) {
 }
 
 export default async function HistoryPage() {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
+  const { supabase, session } = await requireServerSessionOrRedirect();
 
   const { data: deployments, error } = await supabase
     .from("deployments")

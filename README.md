@@ -1,12 +1,13 @@
 # Forge
 
-Forge is an AI Forward Deployed Engineer backend built with FastAPI, LangGraph, Supabase, Qdrant, Gemini, PyGithub, Firecrawl, and E2B.
+Forge is an AI Forward Deployed Engineer workspace with two applications:
 
-It ingests code and docs, analyzes client problems against retrieved context, plans implementation tasks, generates diffs, validates them in a sandbox, opens pull requests, and stores reusable solution templates for future runs.
+- a Python FastAPI backend in `app/`
+- a Next.js operator console in `autopilot/`
 
-## Architecture
+The backend handles ingestion, analysis, planning, coding, testing, deployment, and workflow orchestration. The frontend handles GitHub sign-in, project onboarding, streamed analysis, task review, artifact review, and deployment visibility.
 
-The application lives under `app/`:
+## Backend architecture
 
 ```text
 app/
@@ -18,28 +19,44 @@ app/
 `-- main.py      # FastAPI app entrypoint
 ```
 
-## Features
+## Frontend architecture
 
-- Ingests GitHub repos, docs, and raw text into Qdrant
-- Analyzes codebase context with Gemini + RAG
-- Breaks solutions into implementation tasks
-- Generates unified diffs and validation tests
-- Runs sandboxed verification with retry logic
-- Opens GitHub pull requests from approved changes
-- Stores reusable solution templates for future retrieval
-- Streams long-running workflow updates over SSE
+```text
+autopilot/
+|-- src/app/         # Next.js App Router pages and route handlers
+|-- src/components/  # Shared UI components
+|-- src/lib/         # Supabase, env, email, and auth helpers
+`-- supabase/        # SQL migrations for the frontend data model
+```
 
-## Requirements
+## Local development
 
-- Python 3.11+
-- Supabase project and tables
-- Qdrant Cloud project
-- Gemini API key
-- GitHub token
-- Firecrawl API key
-- E2B API key
+### Backend
 
-## Environment Variables
+```powershell
+cd C:\Users\prana\OneDrive\Documents\Playground\Forge
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+### Frontend
+
+```powershell
+cd C:\Users\prana\OneDrive\Documents\Playground\Forge\autopilot
+cmd /c npm install --legacy-peer-deps
+cmd /c npm run dev
+```
+
+## Environment files
+
+- Backend variables live in `Forge/.env`
+- Frontend variables live in `Forge/autopilot/.env.local`
+
+These files are intentionally ignored and should never be committed.
+
+## Backend environment variables
 
 Copy `.env.example` to `.env` and set:
 
@@ -54,45 +71,17 @@ E2B_API_KEY=
 FIRECRAWL_API_KEY=
 ```
 
-## Installation
-
-Using `pip`:
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-Using `pyproject.toml`:
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e .
-```
-
-## Running Locally
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Health check:
-
-```bash
-GET /health
-```
-
-## API Endpoints
+## Core API endpoints
 
 - `POST /ingest`
 - `POST /analyze`
+- `POST /analyze/stream`
 - `POST /run`
 - `POST /deploy`
 - `POST /workflow`
+- `GET /health`
 
-`/analyze` and `/workflow` stream updates as Server-Sent Events.
+`/analyze/stream` and `/workflow` stream updates as Server-Sent Events.
 
 ## Workflow
 
@@ -106,36 +95,6 @@ tester -> end        (if human review is needed)
 deploy -> feedback -> end
 ```
 
-## Data Dependencies
+## Current state
 
-Forge expects these Supabase tables:
-
-- `projects`
-- `tasks`
-- `code_artifacts`
-- `deployments`
-
-Forge also uses Qdrant collections:
-
-- `project_{project_id}`
-- `solution_templates`
-
-## Container Usage
-
-Build:
-
-```bash
-docker build -t forge-ai-fde .
-```
-
-Run:
-
-```bash
-docker run --env-file .env -p 8000:8000 forge-ai-fde
-```
-
-## Notes
-
-- Some agent integrations depend on external APIs and were structured for async-safe FastAPI usage.
-- Deployment expects diffs in `code_artifacts` to be marked as approved before `POST /deploy`.
-- The workflow endpoint is the easiest way to drive the full system end to end.
+Forge now has a functional frontend operator console, backend workflow scaffolding, backend agent source files, real frontend-to-backend analysis streaming, and a minimal API test suite. The backend still needs deeper production hardening and broader integration coverage before it can be considered fully production-ready.

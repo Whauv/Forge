@@ -1,8 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
-import { createServerSupabaseClient } from "@/lib/supabase";
-import type { ProjectRow } from "@/types/db";
+import { requireOwnedProjectOrRedirect } from "@/lib/server-access";
 
 type ProjectDetailPageProps = {
   params: {
@@ -13,30 +10,7 @@ type ProjectDetailPageProps = {
 export const dynamic = "force-dynamic";
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const { data: project, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", params.id)
-    .eq("user_id", session.user.id)
-    .returns<ProjectRow[]>()
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!project) {
-    redirect("/projects");
-  }
+  const { project } = await requireOwnedProjectOrRedirect(params.id);
 
   return (
     <main className="space-y-6">

@@ -1,5 +1,10 @@
-__pycache__/
-*.py[cod]
 .env
+.env.local
 .venv/
 venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+autopilot/.env.local
+autopilot/node_modules/
+autopilot/.next/
