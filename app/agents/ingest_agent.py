@@ -3,7 +3,6 @@ import re
 import time
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 from uuid import uuid4
 
 import google.generativeai as genai
@@ -11,6 +10,7 @@ from firecrawl import FirecrawlApp
 from github import ContentFile, Github
 
 from app.core.config import get_required_env
+from app.core.repo_utils import infer_project_name, parse_github_repo_name
 from app.db.qdrant_client import create_collection, upsert_vectors
 from app.db.supabase_client import insert_project, select_project_by_id, update_project_by_id
 
@@ -90,7 +90,7 @@ class IngestAgent:
             return {"status": "error", "message": str(exc)}
 
     async def _fetch_repo_documents(self, repo_url: str) -> list[dict[str, Any]]:
-        repo = await asyncio.to_thread(self.github_client.get_repo, self._parse_repo_name(repo_url))
+        repo = await asyncio.to_thread(self.github_client.get_repo, parse_github_repo_name(repo_url))
         documents: list[dict[str, Any]] = []
         queue = list(await asyncio.to_thread(repo.get_contents, ""))
 
@@ -247,11 +247,14 @@ class IngestAgent:
         return vectors
 
     async def _save_project_record(self, project_id: str, payload: dict[str, Any]) -> None:
+        repo_url = payload.get("repo_url")
+        inferred_name = infer_project_name(repo_url) if repo_url else f"Project {project_id[:8]}"
         record = {
             "id": project_id,
-            "repo_url": payload.get("repo_url"),
+            "name": payload.get("name") or inferred_name,
+            "github_repo_url": repo_url,
             "doc_urls": payload.get("doc_urls") or [],
-            "raw_text": payload.get("raw_text"),
+            "problem_description": payload.get("raw_text"),
             "status": "ingested",
         }
         existing = await select_project_by_id(project_id)
@@ -259,7 +262,8 @@ class IngestAgent:
 
         if existing_rows:
             await update_project_by_id(project_id, record)
-        else:
+        elif payload.get("user_id"):
+            record["user_id"] = payload["user_id"]
             await insert_project(record)
 
     def _extract_markdown(self, result: Any) -> str:
@@ -275,16 +279,6 @@ class IngestAgent:
         if isinstance(data, dict):
             return data.get("markdown", "") or ""
         return ""
-
-    def _parse_repo_name(self, repo_url: str) -> str:
-        parsed = urlparse(repo_url)
-        path = parsed.path.strip("/")
-        if path.endswith(".git"):
-            path = path[:-4]
-        parts = [part for part in path.split("/") if part]
-        if len(parts) < 2:
-            raise ValueError("repo_url must point to a valid GitHub repository.")
-        return "/".join(parts[:2])
 
     def _detect_language(self, file_path: str) -> str:
         extension = Path(file_path).suffix.lower()

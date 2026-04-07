@@ -132,7 +132,7 @@ async def deploy_node(state: AgentState) -> AgentState:
                 "project_id": state["project_id"],
                 "repo_url": state.get("repo_url"),
                 "approved_diffs": approved_diffs,
-                "task_id": current_task.get("task_id") or current_task.get("id"),
+                "task_id": current_task.get("id"),
                 "task_title": current_task.get("title") or "AI-FDE deployment",
                 "pain_points": state.get("analysis", {}).get("pain_points"),
                 "proposed_solution": state.get("analysis", {}).get("proposed_solution"),

@@ -49,6 +49,13 @@ cmd /c npm install --legacy-peer-deps
 cmd /c npm run dev
 ```
 
+### Database migrations
+
+Run both Supabase migrations in `autopilot/supabase/migrations`:
+
+- `001_init.sql` creates the base AutoPilot tables
+- `002_backend_workflow_fields.sql` adds the backend workflow metadata columns used by the Python agents
+
 ## Environment files
 
 - Backend variables live in `Forge/.env`
