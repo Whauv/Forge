@@ -1,41 +1,17 @@
+import asyncio
+import json
 from typing import Any
+from uuid import uuid4
 
-from app.agents.utils import generate_json
+import google.generativeai as genai
+from pydantic import BaseModel, ValidationError
+
+from app.core.config import get_required_env
+from app.core.json_stream import extract_array_field, extract_json_object
 from app.db.supabase_client import insert_task
 
-
-class ArchitectAgent:
-    async def run(self, payload: dict[str, Any]) -> dict[str, Any]:
-        project_id = str(payload.get("project_id") or "").strip()
-        analysis = payload.get("analysis")
-        if not project_id or not isinstance(analysis, dict):
-            raise ValueError("project_id and analysis are required")
-
-        prompt = _build_architect_prompt(analysis)
-        try:
-            result = await generate_json(prompt)
-        except Exception:
-            result = _fallback_task_graph(analysis)
-
-        task_graph = _validate_task_graph(result)
-        for task in task_graph["tasks"]:
-            await insert_task(
-                {
-                    "project_id": project_id,
-                    "title": task["title"],
-                    "description": task["description"],
-                    "status": "pending",
-                    "clarifying_question": None,
-                }
-            )
-
-        return task_graph
-
-
-def _build_architect_prompt(analysis: dict[str, Any]) -> str:
-    return f"""
-You are a software architect. Based on this analysis:
-{analysis}
+ARCHITECT_PROMPT = """You are a software architect. Based on this analysis:
+{analysis_json}
 
 Break the proposed solution into an ordered list of implementation tasks.
 Respond ONLY in this JSON format:
@@ -43,82 +19,108 @@ Respond ONLY in this JSON format:
   "tasks": [
     {{
       "task_id": "t1",
-      "title": "task title",
-      "description": "task description",
-      "files_to_modify": ["file path"],
-      "depends_on": [],
-      "type": "create"
+      "title": str,
+      "description": str,
+      "files_to_modify": [list of file paths],
+      "depends_on": [list of task_ids or empty],
+      "type": "create|modify|delete"
     }}
   ]
 }}
 Keep tasks small and atomic. Max 7 tasks total.
-""".strip()
+"""
 
 
-def _validate_task_graph(result: dict[str, Any]) -> dict[str, Any]:
-    tasks = result.get("tasks")
-    if not isinstance(tasks, list):
-        raise ValueError("architect response must contain tasks")
+class ArchitectTask(BaseModel):
+    task_id: str
+    title: str
+    description: str
+    files_to_modify: list[str]
+    depends_on: list[str]
+    type: str
 
-    normalized: list[dict[str, Any]] = []
-    for index, task in enumerate(tasks[:7], start=1):
-        if not isinstance(task, dict):
-            continue
-        normalized.append(
-            {
-                "task_id": str(task.get("task_id") or f"t{index}"),
-                "title": str(task.get("title") or f"Implementation task {index}").strip(),
-                "description": str(task.get("description") or "No description provided.").strip(),
-                "files_to_modify": [str(item) for item in task.get("files_to_modify", []) if str(item).strip()],
-                "depends_on": [str(item) for item in task.get("depends_on", []) if str(item).strip()],
-                "type": str(task.get("type") or "modify").strip().lower(),
-            }
+
+class ArchitectResult(BaseModel):
+    tasks: list[ArchitectTask]
+
+
+class ArchitectAgent:
+    def __init__(self) -> None:
+        genai.configure(api_key=get_required_env("GEMINI_API_KEY"))
+        self.architect_model = genai.GenerativeModel("gemini-2.0-flash")
+
+    async def run(self, project_id: str, analysis: dict[str, Any]) -> dict[str, Any]:
+        try:
+            prompt = self._build_prompt(analysis)
+            response_text = await asyncio.to_thread(self._generate_response, prompt)
+            parsed = self._parse_and_validate(response_text)
+            await self._save_tasks(project_id, parsed["tasks"])
+            return parsed
+        except Exception as exc:
+            return {"status": "error", "message": str(exc)}
+
+    async def stream(self, project_id: str, analysis: dict[str, Any]):
+        prompt = self._build_prompt(analysis)
+        response = self.architect_model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"},
+            stream=True,
         )
 
-    if not normalized:
-        raise ValueError("architect response returned no usable tasks")
-    return {"tasks": normalized}
+        buffer = ""
+        emitted_fields: set[str] = set()
+        for chunk in response:
+            text = getattr(chunk, "text", "") or ""
+            if not text:
+                continue
 
+            buffer += text
+            tasks = extract_array_field(buffer, "tasks")
+            if tasks is not None and "tasks" not in emitted_fields:
+                emitted_fields.add("tasks")
+                yield {"field": "tasks", "value": tasks}
+            await asyncio.sleep(0)
 
-def _fallback_task_graph(analysis: dict[str, Any]) -> dict[str, Any]:
-    solution = str(analysis.get("proposed_solution") or "Implement the proposed solution.")
-    question = analysis.get("clarifying_question")
-    tasks = [
-        {
-            "task_id": "t1",
-            "title": "Map the current implementation gap",
-            "description": "Identify the modules and data flow required to support the proposed solution.",
-            "files_to_modify": ["app/api/routes/analyze.py", "autopilot/src/app/api/analyze/route.ts"],
-            "depends_on": [],
-            "type": "modify",
-        },
-        {
-            "task_id": "t2",
-            "title": "Implement backend support",
-            "description": solution,
-            "files_to_modify": ["app/agents/analysis_agent.py", "app/agents/architect_agent.py"],
-            "depends_on": ["t1"],
-            "type": "modify",
-        },
-        {
-            "task_id": "t3",
-            "title": "Validate frontend integration",
-            "description": "Connect the frontend stream and project review pages to the backend output.",
-            "files_to_modify": ["autopilot/src/components/analysis-stream.tsx", "autopilot/src/app/projects/[id]/tasks/page.tsx"],
-            "depends_on": ["t2"],
-            "type": "modify",
-        },
-    ]
-    if question:
-        tasks.append(
-            {
-                "task_id": "t4",
-                "title": "Resolve open product question",
-                "description": f"Capture an answer to: {question}",
-                "files_to_modify": ["autopilot/src/components/task-graph.tsx"],
-                "depends_on": ["t1"],
-                "type": "modify",
-            }
+        parsed = self._parse_and_validate(buffer)
+        await self._save_tasks(project_id, parsed["tasks"])
+        yield {"field": "_final", "value": parsed}
+
+    def _build_prompt(self, analysis: dict[str, Any]) -> str:
+        return ARCHITECT_PROMPT.format(
+            analysis_json=json.dumps(analysis, indent=2),
         )
-    return {"tasks": tasks}
 
+    def _generate_response(self, prompt: str) -> str:
+        response = self.architect_model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"},
+        )
+        return getattr(response, "text", "") or ""
+
+    def _parse_and_validate(self, response_text: str) -> dict[str, Any]:
+        try:
+            parsed = extract_json_object(response_text)
+            result = ArchitectResult.model_validate(parsed)
+        except (json.JSONDecodeError, ValidationError) as exc:
+            raise ValueError(f"Invalid architect JSON returned by Gemini: {exc}") from exc
+
+        tasks = result.model_dump()["tasks"]
+        if len(tasks) > 7:
+            raise ValueError("Architect returned more than 7 tasks.")
+        return {"tasks": tasks}
+
+    async def _save_tasks(self, project_id: str, tasks: list[dict[str, Any]]) -> None:
+        for task in tasks:
+            await insert_task(
+                {
+                    "id": str(uuid4()),
+                    "project_id": project_id,
+                    "status": "planned",
+                    "task_id": task["task_id"],
+                    "title": task["title"],
+                    "description": task["description"],
+                    "files_to_modify": task["files_to_modify"],
+                    "depends_on": task["depends_on"],
+                    "type": task["type"],
+                }
+            )

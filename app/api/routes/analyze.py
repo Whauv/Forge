@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -16,9 +17,13 @@ async def analyze(payload: AnalyzeRequest) -> JSONResponse:
         analysis = await AnalysisAgent().run(
             {"project_id": payload.project_id, "user_query": payload.query}
         )
-        task_graph = await ArchitectAgent().run(
-            {"project_id": payload.project_id, "analysis": analysis}
-        )
+        if analysis.get("status") == "error":
+            raise ValueError(str(analysis["message"]))
+
+        task_graph = await ArchitectAgent().run(payload.project_id, analysis)
+        if task_graph.get("status") == "error":
+            raise ValueError(str(task_graph["message"]))
+
         return JSONResponse({"analysis": analysis, "task_graph": task_graph})
     except Exception as exc:
         return JSONResponse(
@@ -30,15 +35,22 @@ async def analyze(payload: AnalyzeRequest) -> JSONResponse:
 @router.post("/stream")
 async def analyze_stream(payload: AnalyzeRequest) -> StreamingResponse:
     async def event_stream():
-        analysis_agent = AnalysisAgent()
         try:
-            analysis = await analysis_agent.run(
+            analysis = await AnalysisAgent().run(
                 {"project_id": payload.project_id, "user_query": payload.query}
             )
-            for pain_point in analysis["pain_points"]:
+            if analysis.get("status") == "error":
+                raise ValueError(str(analysis["message"]))
+
+            pain_points = analysis.get("pain_points", [])
+            for pain_point in pain_points:
                 yield f"data: {json.dumps({'type': 'pain_point', 'content': pain_point})}\n\n"
-            yield f"data: {json.dumps({'type': 'solution', 'content': analysis['proposed_solution']})}\n\n"
-            if analysis["clarifying_question"]:
+
+            yield (
+                f"data: {json.dumps({'type': 'solution', 'content': analysis['proposed_solution']})}\n\n"
+            )
+
+            if analysis.get("clarifying_question"):
                 yield (
                     "data: "
                     + json.dumps(
@@ -50,9 +62,9 @@ async def analyze_stream(payload: AnalyzeRequest) -> StreamingResponse:
                     + "\n\n"
                 )
 
-            task_graph = await ArchitectAgent().run(
-                {"project_id": payload.project_id, "analysis": analysis}
-            )
+            task_graph = await ArchitectAgent().run(payload.project_id, analysis)
+            if task_graph.get("status") == "error":
+                raise ValueError(str(task_graph["message"]))
             yield f"data: {json.dumps({'type': 'task_graph', 'content': task_graph})}\n\n"
         except Exception as exc:
             yield f"data: {json.dumps({'type': 'error', 'content': str(exc)})}\n\n"

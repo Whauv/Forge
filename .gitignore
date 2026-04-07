@@ -1,9 +1,10 @@
 .env
 .env.local
 .venv/
+venv/
+__pycache__/
 **/__pycache__/
 *.py[cod]
 autopilot/.env.local
 autopilot/node_modules/
 autopilot/.next/
-

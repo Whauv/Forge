@@ -1,20 +1,23 @@
-from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse
+from typing import Any
 
-from app.api.schemas import IngestRequest, StatusResponse
+from fastapi import APIRouter
+from pydantic import BaseModel, Field
+
+from app.agents.ingest_agent import IngestAgent
 
 router = APIRouter(prefix="/ingest", tags=["ingest"])
 
 
-@router.post("/")
-async def ingest(payload: IngestRequest) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        content=StatusResponse(
-            status="not_implemented",
-            message=(
-                "The backend ingest pipeline is scaffolded but not wired to agent "
-                "execution in this local repository snapshot."
-            ),
-        ).model_dump(),
-    )
+class IngestRequest(BaseModel):
+    project_id: str = Field(..., min_length=1)
+    repo_url: str | None = None
+    doc_urls: list[str] | None = None
+    raw_text: str | None = None
+
+
+@router.post("")
+async def ingest(payload: IngestRequest) -> dict[str, Any]:
+    try:
+        return await IngestAgent().run(payload.model_dump())
+    except Exception as exc:
+        return {"status": "error", "message": str(exc)}
