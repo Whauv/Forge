@@ -46,6 +46,7 @@ Create `autopilot/.env.local` from `autopilot/.env.example` and set:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL`
+- `FORGE_BACKEND_URL`
 
 All runtime environment variables are validated in [src/lib/env.ts](./src/lib/env.ts).
 
@@ -64,6 +65,7 @@ cp .env.example .env.local
 ```
 
 3. Add your real Supabase and Resend values to `.env.local`.
+   Set `FORGE_BACKEND_URL` to your FastAPI backend, for example `http://127.0.0.1:8000` in local development.
 
 4. Run the Supabase migration so the app tables exist:
 
@@ -99,13 +101,20 @@ Unauthenticated visitors are redirected to `/login`, and authenticated users lan
 
 1. In Supabase, enable GitHub as an auth provider.
 2. Create a GitHub OAuth app.
-3. Set the callback URL to:
+3. In the GitHub OAuth app, set the callback URL to the Supabase auth callback for your project:
 
 ```text
-http://localhost:3000/auth/callback
+https://<your-project-ref>.supabase.co/auth/v1/callback
 ```
 
-4. Add the production callback URL in both Supabase and GitHub once deployed.
+4. In Supabase `Authentication -> URL Configuration`, set:
+
+```text
+Site URL: http://localhost:3000
+Redirect URL: http://localhost:3000/auth/callback
+```
+
+5. Add the production callback URL in both Supabase and GitHub once deployed.
 
 ## Deployment
 

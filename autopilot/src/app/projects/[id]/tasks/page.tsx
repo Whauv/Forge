@@ -1,5 +1,5 @@
 import { TaskGraph } from "@/components/task-graph";
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { requireOwnedProjectOrRedirect } from "@/lib/server-access";
 import type { TaskRow } from "@/types/db";
 
 type ProjectTasksPageProps = {
@@ -11,7 +11,7 @@ type ProjectTasksPageProps = {
 export const dynamic = "force-dynamic";
 
 export default async function ProjectTasksPage({ params }: ProjectTasksPageProps) {
-  const supabase = createServerSupabaseClient();
+  const { supabase } = await requireOwnedProjectOrRedirect(params.id);
 
   const { data: tasks, error } = await supabase
     .from("tasks")

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { createRouteHandlerSupabaseClient } from "@/lib/supabase";
+import { requireRouteSession } from "@/lib/server-access";
 import type { TaskStatus } from "@/types/db";
 
 type PatchPayload = {
@@ -20,13 +20,25 @@ export async function PATCH(request: Request, { params }: TaskPatchRouteProps) {
       return NextResponse.json({ error: "Invalid task status." }, { status: 400 });
     }
 
-    const supabase = createRouteHandlerSupabaseClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const auth = await requireRouteSession();
+    if ("response" in auth) {
+      return auth.response;
+    }
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    const { supabase, userId } = auth;
+    const { data: task, error: fetchError } = await supabase
+      .from("tasks")
+      .select("id,project:projects!inner(user_id)")
+      .eq("id", params.taskId)
+      .eq("project.user_id", userId)
+      .maybeSingle();
+
+    if (fetchError) {
+      return NextResponse.json({ error: fetchError.message }, { status: 500 });
+    }
+
+    if (!task) {
+      return NextResponse.json({ error: "Task not found." }, { status: 404 });
     }
 
     const { error } = await supabase

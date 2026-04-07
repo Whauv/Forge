@@ -7,6 +7,7 @@ type ServerEnv = PublicEnv & {
   SUPABASE_SERVICE_ROLE_KEY: string;
   RESEND_API_KEY: string;
   RESEND_FROM_EMAIL: string;
+  FORGE_BACKEND_URL: string;
 };
 
 function requireEnv(name: string): string {
@@ -15,6 +16,10 @@ function requireEnv(name: string): string {
     throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
+}
+
+function getOptionalEnv(name: string, fallback: string): string {
+  return process.env[name]?.trim() || fallback;
 }
 
 export const publicEnv: PublicEnv = {
@@ -34,6 +39,7 @@ export function getServerEnv(): ServerEnv {
     SUPABASE_SERVICE_ROLE_KEY: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
     RESEND_API_KEY: requireEnv("RESEND_API_KEY"),
     RESEND_FROM_EMAIL: requireEnv("RESEND_FROM_EMAIL"),
+    FORGE_BACKEND_URL: getOptionalEnv("FORGE_BACKEND_URL", "http://127.0.0.1:8000"),
   };
 
   return cachedServerEnv;

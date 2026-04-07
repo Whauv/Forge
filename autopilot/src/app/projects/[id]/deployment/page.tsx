@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { requireOwnedProjectOrRedirect } from "@/lib/server-access";
 import type { DeploymentRow } from "@/types/db";
 
 type ProjectDeploymentPageProps = {
@@ -14,14 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function ProjectDeploymentPage({
   params,
 }: ProjectDeploymentPageProps) {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
+  const { supabase } = await requireOwnedProjectOrRedirect(params.id);
 
   const { data: deployment, error } = await supabase
     .from("deployments")

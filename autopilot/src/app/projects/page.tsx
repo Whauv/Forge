@@ -1,20 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-import { createServerSupabaseClient } from "@/lib/supabase";
+import { requireServerSessionOrRedirect } from "@/lib/server-access";
 import type { ProjectRow } from "@/types/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
+  const { supabase, session } = await requireServerSessionOrRedirect();
 
   const { data: projects, error } = await supabase
     .from("projects")

@@ -1,4 +1,5 @@
 import { AnalysisStream } from "@/components/analysis-stream";
+import { requireOwnedProjectOrRedirect } from "@/lib/server-access";
 
 type AnalyzePageProps = {
   params: {
@@ -6,7 +7,9 @@ type AnalyzePageProps = {
   };
 };
 
-export default function AnalyzePage({ params }: AnalyzePageProps) {
+export default async function AnalyzePage({ params }: AnalyzePageProps) {
+  await requireOwnedProjectOrRedirect(params.id);
+
   return (
     <main className="space-y-6">
       <section className="rounded-[2rem] border border-line bg-surface p-8 shadow-[0_18px_60px_rgba(20,33,61,0.08)] dark:bg-surface/75">

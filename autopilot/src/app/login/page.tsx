@@ -4,7 +4,24 @@ import { createServerSupabaseClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoginPage() {
+type LoginPageProps = {
+  searchParams?: {
+    error?: string;
+  };
+};
+
+function errorMessage(errorCode: string | undefined) {
+  switch (errorCode) {
+    case "oauth_start_failed":
+      return "GitHub sign-in could not be started. Check your Supabase provider settings.";
+    case "oauth_callback_failed":
+      return "GitHub sign-in returned without a usable session. Verify the callback URL and provider credentials.";
+    default:
+      return null;
+  }
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const supabase = createServerSupabaseClient();
   const {
     data: { session },
@@ -13,6 +30,8 @@ export default async function LoginPage() {
   if (session) {
     redirect("/");
   }
+
+  const authError = errorMessage(searchParams?.error);
 
   return (
     <main className="min-h-screen bg-[linear-gradient(135deg,_#10213e_0%,_#1f2f56_48%,_#ff7a18_140%)] px-6 py-10 text-white">
@@ -53,6 +72,11 @@ export default async function LoginPage() {
             Supabase handles the OAuth exchange. After login, every route except this page
             is protected by middleware.
           </p>
+          {authError ? (
+            <p className="mt-4 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm leading-7 text-white/85">
+              {authError}
+            </p>
+          ) : null}
           <form action="/auth/sign-in" method="post" className="mt-8">
             <button className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-4 text-sm font-semibold text-[#10213e] transition hover:bg-[#ffe3d0]">
               Continue with GitHub

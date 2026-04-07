@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from app.api.routes.analyze import router as analyze_router
 from app.api.routes.deploy import router as deploy_router
 from app.api.routes.ingest import router as ingest_router
 from app.api.routes.run import router as run_router
+from app.graph.workflow import run_workflow
 
 app = FastAPI(title="AI Forward Deployed Engineer")
 
@@ -25,3 +27,8 @@ app.include_router(deploy_router)
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.post("/workflow")
+async def workflow(payload: dict) -> StreamingResponse:
+    return StreamingResponse(run_workflow(payload), media_type="text/event-stream")
