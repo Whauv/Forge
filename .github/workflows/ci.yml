@@ -26,6 +26,13 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+      RESEND_API_KEY: ci-resend-key
+      RESEND_FROM_EMAIL: ci@example.com
+      FORGE_BACKEND_URL: http://127.0.0.1:8000
     defaults:
       run:
         working-directory: autopilot
