@@ -29,6 +29,13 @@ autopilot/
 `-- supabase/        # SQL migrations for the frontend data model
 ```
 
+## Repository support files
+
+- `AGENTS.md` captures repo-specific setup, validation, and folder guidance.
+- `CONTRIBUTING.md` captures branch, validation, and review expectations.
+- `.github/` contains CI and collaboration templates.
+- `LICENSE` ships the project under MIT terms.
+
 ## Local development
 
 ### Backend
@@ -60,6 +67,7 @@ Run both Supabase migrations in `autopilot/supabase/migrations`:
 
 - Backend variables live in `Forge/.env`
 - Frontend variables live in `Forge/autopilot/.env.local`
+- Safe placeholders for the frontend live in `Forge/autopilot/.env.example`
 
 These files are intentionally ignored and should never be committed.
 

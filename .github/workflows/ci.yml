@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - "codex/**"
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run backend tests
+        run: python -m unittest discover -s tests -t .
+      - name: Compile backend packages
+        run: python -m compileall app tests
+
+  frontend:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+      RESEND_API_KEY: ci-resend-key
+      RESEND_FROM_EMAIL: ci@example.com
+      FORGE_BACKEND_URL: http://127.0.0.1:8000
+    defaults:
+      run:
+        working-directory: autopilot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: autopilot/package-lock.json
+      - name: Install frontend dependencies
+        run: npm install --legacy-peer-deps
+      - name: Run frontend tests
+        run: npm run test
+      - name: Build frontend
+        run: npm run build
