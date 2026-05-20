@@ -23,14 +23,14 @@ const navItems = [
 
 export function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
-  const isAuthPage = pathname === "/login";
+  const isMarketingPage = pathname === "/" || pathname === "/login";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
 
-  if (isAuthPage) {
+  if (isMarketingPage) {
     return <>{children}</>;
   }
 
