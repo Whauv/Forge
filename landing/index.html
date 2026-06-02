@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forge — AI Forward Deployed Engineer</title>
+    <title>Forge - AI Forward Deployed Engineer</title>
     <meta
       name="description"
       content="Forge ingests repositories and docs, retrieves relevant code context from a vector store, analyzes client problems, proposes implementation tasks, and walks projects through coding, testing, and deployment with an operator console on top."
@@ -31,11 +31,104 @@
         --text-secondary: #94a3b8;
         --text-muted: #475569;
         --border-subtle: rgba(255, 255, 255, 0.07);
-        --border-active: rgba(249, 115, 22, 0.3);
-        --glow-orange: rgba(249, 115, 22, 0.12);
-        --glow-teal: rgba(6, 182, 212, 0.1);
-        --shadow-panel: 0 24px 90px rgba(0, 0, 0, 0.32);
+        --orange-glow: rgba(249, 115, 22, 0.12);
+        --teal-glow: rgba(6, 182, 212, 0.1);
         --container: 1280px;
+        --body-bg:
+          radial-gradient(circle at 82% 14%, rgba(6, 182, 212, 0.08), transparent 18%),
+          radial-gradient(circle at 14% 84%, rgba(249, 115, 22, 0.08), transparent 22%),
+          linear-gradient(180deg, #05070b 0%, #07090d 32%, #0a0d14 100%);
+        --page-overlay:
+          radial-gradient(circle at 24% 22%, rgba(255, 255, 255, 0.025), transparent 18%),
+          radial-gradient(circle at 76% 78%, rgba(255, 255, 255, 0.02), transparent 18%);
+        --nav-scrolled-bg: rgba(7, 9, 13, 0.9);
+        --nav-border: rgba(255, 255, 255, 0.06);
+        --status-strip-bg: rgba(249, 115, 22, 0.06);
+        --status-strip-top: rgba(249, 115, 22, 0.08);
+        --status-strip-bottom: rgba(249, 115, 22, 0.1);
+        --hero-shell-border-top: rgba(255, 255, 255, 0.06);
+        --hero-shell-border-side: rgba(255, 255, 255, 0.03);
+        --hero-shell-fill:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0)),
+          radial-gradient(circle at 18% 82%, rgba(249, 115, 22, 0.08), transparent 26%);
+        --capability-text: #d3dbe7;
+        --what-copy: #d4dcea;
+        --surface-copy: #d3dbe7;
+        --mobile-drawer-bg: rgba(10, 14, 22, 0.96);
+        --surface-section-wash:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0)),
+          linear-gradient(180deg, rgba(12, 15, 21, 0.7), rgba(12, 15, 21, 0.92));
+        --slab-border: rgba(255, 255, 255, 0.07);
+        --slab-bg:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0)),
+          rgba(17, 22, 32, 0.8);
+        --slab-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+        --slab-outline:
+          linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.12),
+            rgba(255, 255, 255, 0.03) 32%,
+            rgba(255, 255, 255, 0.03) 70%,
+            rgba(255, 255, 255, 0.08)
+          );
+        --install-slab-bg:
+          linear-gradient(180deg, rgba(6, 182, 212, 0.05), rgba(17, 22, 32, 0.9)),
+          rgba(17, 22, 32, 0.8);
+        --row-separator: rgba(255, 255, 255, 0.05);
+      }
+
+      html[data-theme="light"] {
+        --bg: #f6f7fb;
+        --surface-1: #ffffff;
+        --surface-2: #f3f6fb;
+        --surface-3: #e9eef8;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --border-subtle: rgba(15, 23, 42, 0.1);
+        --orange-glow: rgba(249, 115, 22, 0.1);
+        --teal-glow: rgba(6, 182, 212, 0.08);
+        --body-bg:
+          radial-gradient(circle at 84% 12%, rgba(6, 182, 212, 0.08), transparent 18%),
+          radial-gradient(circle at 14% 82%, rgba(249, 115, 22, 0.08), transparent 22%),
+          linear-gradient(180deg, #fcfdff 0%, #f6f7fb 34%, #edf2f8 100%);
+        --page-overlay:
+          radial-gradient(circle at 24% 22%, rgba(148, 163, 184, 0.12), transparent 18%),
+          radial-gradient(circle at 76% 78%, rgba(148, 163, 184, 0.1), transparent 18%);
+        --nav-scrolled-bg: rgba(248, 250, 252, 0.88);
+        --nav-border: rgba(15, 23, 42, 0.08);
+        --status-strip-bg: rgba(249, 115, 22, 0.09);
+        --status-strip-top: rgba(249, 115, 22, 0.16);
+        --status-strip-bottom: rgba(249, 115, 22, 0.16);
+        --hero-shell-border-top: rgba(15, 23, 42, 0.08);
+        --hero-shell-border-side: rgba(15, 23, 42, 0.06);
+        --hero-shell-fill:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18)),
+          radial-gradient(circle at 18% 82%, rgba(249, 115, 22, 0.08), transparent 26%);
+        --capability-text: #1e293b;
+        --what-copy: #1f2937;
+        --surface-copy: #1e293b;
+        --mobile-drawer-bg: rgba(255, 255, 255, 0.96);
+        --surface-section-wash:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18)),
+          linear-gradient(180deg, rgba(241, 245, 249, 0.88), rgba(232, 238, 247, 0.96));
+        --slab-border: rgba(148, 163, 184, 0.28);
+        --slab-bg:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.72)),
+          rgba(255, 255, 255, 0.88);
+        --slab-shadow: 0 24px 60px rgba(148, 163, 184, 0.18);
+        --slab-outline:
+          linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.82),
+            rgba(226, 232, 240, 0.65) 32%,
+            rgba(255, 255, 255, 0.58) 70%,
+            rgba(203, 213, 225, 0.72)
+          );
+        --install-slab-bg:
+          linear-gradient(180deg, rgba(6, 182, 212, 0.08), rgba(255, 255, 255, 0.88)),
+          rgba(255, 255, 255, 0.92);
+        --row-separator: rgba(148, 163, 184, 0.18);
       }
 
       * {
@@ -49,19 +142,18 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background:
-          radial-gradient(circle at 18% 78%, rgba(249, 115, 22, 0.05), transparent 22%),
-          radial-gradient(circle at 82% 20%, rgba(6, 182, 212, 0.04), transparent 18%),
-          var(--bg);
+        background: var(--body-bg);
         color: var(--text-primary);
         font-family: "Geist", Inter, system-ui, sans-serif;
         overflow-x: hidden;
+        transition:
+          background 0.25s ease,
+          color 0.25s ease;
       }
 
       body.cursor-active,
       body.cursor-active a,
-      body.cursor-active button,
-      body.cursor-active summary {
+      body.cursor-active button {
         cursor: none;
       }
 
@@ -74,35 +166,32 @@
         font: inherit;
       }
 
-      .page-shell {
+      .page {
         position: relative;
         isolation: isolate;
       }
 
-      .page-shell::before {
+      .page::before {
         content: "";
         position: fixed;
         inset: 0;
         z-index: -2;
+        pointer-events: none;
         background-image:
-          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-          radial-gradient(circle at center, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-        background-size: 44px 44px, 44px 44px, 14px 14px;
-        background-position: 0 0, 0 0, 0 0;
-        opacity: 0.75;
-        animation: gridDrift 40s linear infinite;
+          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+        background-size: 56px 56px;
+        opacity: 0.5;
+        animation: grid-drift 34s linear infinite;
       }
 
-      .page-shell::after {
+      .page::after {
         content: "";
         position: fixed;
         inset: 0;
         z-index: -1;
         pointer-events: none;
-        background:
-          radial-gradient(circle at 18% 74%, rgba(249, 115, 22, 0.09), transparent 22%),
-          radial-gradient(circle at 82% 16%, rgba(6, 182, 212, 0.08), transparent 18%);
+        background: var(--page-overlay);
       }
 
       .container {
@@ -113,7 +202,7 @@
       .site-nav {
         position: sticky;
         top: 0;
-        z-index: 50;
+        z-index: 60;
         transition:
           background 180ms ease,
           backdrop-filter 180ms ease,
@@ -122,87 +211,122 @@
       }
 
       .site-nav.scrolled {
-        background: rgba(7, 9, 13, 0.9);
+        background: var(--nav-scrolled-bg);
         backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.22);
+        border-bottom: 1px solid var(--nav-border);
+        box-shadow: 0 10px 36px rgba(0, 0, 0, 0.22);
       }
 
       .nav-inner {
+        min-height: 78px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 24px;
-        min-height: 76px;
       }
 
-      .brand {
+      .brand-wrap {
         display: flex;
         align-items: center;
         gap: 18px;
       }
 
-      .brand-block {
+      .brand-stack {
         display: flex;
         flex-direction: column;
         gap: 4px;
       }
 
       .brand-mark {
-        font-size: 1.12rem;
+        font-size: 1.08rem;
         font-weight: 700;
         letter-spacing: -0.03em;
       }
 
-      .brand-subtitle {
+      .brand-sub {
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
         color: var(--text-muted);
-        letter-spacing: 0.08em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
       }
 
-      .live-pill {
+      .system-live {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        padding: 9px 12px;
-        border-radius: 999px;
+        padding: 8px 14px;
         border: 1px solid var(--border-subtle);
+        border-radius: 999px;
         background: rgba(255, 255, 255, 0.03);
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
         color: var(--text-secondary);
-        letter-spacing: 0.04em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
-      .live-dot {
+      .system-live::before {
+        content: "";
         width: 8px;
         height: 8px;
         border-radius: 50%;
         background: var(--success);
         box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
-        animation: livePulse 2s ease-out infinite;
+        animation: live-pulse 2.2s ease-out infinite;
       }
 
-      .nav-links {
+      .nav-actions {
         display: flex;
         align-items: center;
         gap: 14px;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 42px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border-subtle);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text-secondary);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .theme-toggle:hover {
+        transform: translateY(-1px);
+        color: var(--text-primary);
+        border-color: rgba(6, 182, 212, 0.24);
+        background: rgba(6, 182, 212, 0.05);
+      }
+
+      .theme-toggle svg {
+        width: 15px;
+        height: 15px;
       }
 
       .nav-link {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        color: var(--text-secondary);
         font-weight: 500;
-        transition: color 0.2s ease;
+        color: var(--text-secondary);
+        transition: color 0.2s ease, transform 0.2s ease;
       }
 
       .nav-link:hover {
         color: var(--text-primary);
+        transform: translateY(-1px);
       }
 
       .nav-link svg {
@@ -214,11 +338,11 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 12px 18px;
-        border: 0;
-        border-radius: 6px;
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 8px;
         background: var(--accent);
-        color: var(--bg);
+        color: #07090d;
         font-weight: 700;
         box-shadow: 0 0 0 transparent;
         transition:
@@ -233,13 +357,13 @@
         transform: translateY(-1px);
       }
 
-      .menu-button {
+      .menu-toggle {
         display: none;
         align-items: center;
         justify-content: center;
         width: 46px;
         height: 46px;
-        border-radius: 10px;
+        border-radius: 12px;
         border: 1px solid var(--border-subtle);
         background: rgba(255, 255, 255, 0.03);
         color: var(--text-primary);
@@ -247,20 +371,19 @@
 
       .status-strip {
         overflow: hidden;
-        border-top: 1px solid rgba(249, 115, 22, 0.08);
-        border-bottom: 1px solid rgba(249, 115, 22, 0.1);
-        background: rgba(249, 115, 22, 0.06);
+        border-top: 1px solid var(--status-strip-top);
+        border-bottom: 1px solid var(--status-strip-bottom);
+        background: var(--status-strip-bg);
       }
 
       .status-track {
         display: flex;
         width: max-content;
         min-width: 200%;
-        white-space: nowrap;
         animation: marquee 24s linear infinite;
       }
 
-      .status-content {
+      .status-copy {
         display: inline-flex;
         align-items: center;
         gap: 18px;
@@ -270,62 +393,86 @@
         color: var(--accent);
         letter-spacing: 0.08em;
         text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .mobile-drawer {
+        display: none;
       }
 
       .hero {
         position: relative;
-        padding: 58px 0 72px;
+        padding: 34px 0 84px;
       }
 
       .hero-grid {
         display: grid;
-        grid-template-columns: minmax(0, 0.58fr) minmax(360px, 0.42fr);
-        gap: 34px;
+        grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+        gap: 48px;
         align-items: start;
       }
 
-      .eyebrow-terminal {
+      .hero-left {
+        position: relative;
+        padding: 42px 0 0;
+      }
+
+      .hero-left::before {
+        content: "";
+        position: absolute;
+        left: -40px;
+        top: 0;
+        width: min(720px, 100%);
+        height: 620px;
+        border-top: 1px solid var(--hero-shell-border-top);
+        border-left: 1px solid var(--hero-shell-border-side);
+        border-radius: 140px 28px 180px 28px;
+        background: var(--hero-shell-fill);
+        pointer-events: none;
+      }
+
+      .eyebrow {
+        position: relative;
+        z-index: 1;
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        padding: 8px 12px;
-        border-radius: 4px;
-        border: 1px solid rgba(6, 182, 212, 0.2);
+        width: fit-content;
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(6, 182, 212, 0.24);
         background: rgba(6, 182, 212, 0.08);
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
         color: var(--teal);
-        letter-spacing: 0.1em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         opacity: 0;
         transform: translateY(10px);
-        animation: badgeIn 0.55s ease forwards;
+        animation: fade-up 0.55s ease forwards;
       }
 
-      .eyebrow-terminal::before {
+      .eyebrow::before {
         content: "";
         width: 7px;
         height: 7px;
         border-radius: 50%;
         background: var(--teal);
-        box-shadow: 0 0 16px rgba(6, 182, 212, 0.45);
-      }
-
-      .hero-copy {
-        display: flex;
-        flex-direction: column;
-        gap: 26px;
-        padding-top: 28px;
+        box-shadow: 0 0 16px rgba(6, 182, 212, 0.44);
       }
 
       .hero-title {
-        margin: 0;
+        position: relative;
+        z-index: 1;
+        margin: 30px 0 0;
         font-family: "Instrument Serif", serif;
         font-style: italic;
         font-weight: 400;
-        font-size: clamp(2.8rem, 5.5vw, 5.8rem);
-        line-height: 0.98;
-        letter-spacing: -0.03em;
+        font-size: clamp(3.5rem, 6.8vw, 7.2rem);
+        line-height: 0.9;
+        letter-spacing: -0.055em;
+        max-width: 9.8ch;
       }
 
       .hero-title .line {
@@ -339,108 +486,118 @@
       }
 
       .hero-title .line:nth-child(1) > span {
-        animation: headlineReveal 0.7s ease-out 0.1s forwards;
+        animation: headline-reveal 0.7s ease-out 0.08s forwards;
       }
 
       .hero-title .line:nth-child(2) > span {
-        animation: headlineReveal 0.7s ease-out 0.22s forwards;
+        animation: headline-reveal 0.7s ease-out 0.2s forwards;
       }
 
       .hero-title .line:nth-child(3) > span {
-        animation: headlineReveal 0.7s ease-out 0.34s forwards;
+        animation: headline-reveal 0.7s ease-out 0.32s forwards;
       }
 
       .hero-title .line:nth-child(4) > span {
-        animation: headlineReveal 0.7s ease-out 0.46s forwards;
+        animation: headline-reveal 0.7s ease-out 0.44s forwards;
       }
 
-      .hero-title .forge-word {
+      .forge-word {
         color: var(--accent);
       }
 
       .hero-body {
-        max-width: 56ch;
-        margin: 0;
+        position: relative;
+        z-index: 1;
+        max-width: 54ch;
+        margin: 34px 0 0;
         color: var(--text-secondary);
         font-size: 1.08rem;
-        line-height: 1.85;
+        line-height: 1.9;
         opacity: 0;
         transform: translateY(14px);
-        animation: fadeSlideUp 0.7s ease 0.55s forwards;
+        animation: fade-up 0.65s ease 0.58s forwards;
       }
 
-      .capability-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+      .capabilities {
+        position: relative;
+        z-index: 1;
+        margin-top: 30px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 14px;
+        max-width: 670px;
       }
 
-      .cap-chip {
+      .capability {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        min-height: 58px;
-        padding: 15px 16px;
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(255, 255, 255, 0.04);
-        color: #cbd5e1;
-        font-size: 0.96rem;
+        gap: 12px;
+        min-height: 50px;
+        padding: 0 16px 0 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0)),
+          rgba(255, 255, 255, 0.018);
+        color: var(--capability-text);
         font-weight: 500;
         opacity: 0;
         transform: translateY(10px);
         transition:
+          transform 0.2s ease,
           border-color 0.2s ease,
-          background 0.2s ease,
-          transform 0.2s ease;
+          background 0.2s ease;
       }
 
-      .cap-chip:hover {
-        border-color: rgba(6, 182, 212, 0.3);
-        background: rgba(6, 182, 212, 0.05);
-        transform: translateY(-1px);
+      .capability:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.03);
       }
 
-      .cap-chip:nth-child(1) {
-        animation: fadeSlideUp 0.55s ease 0.7s forwards;
+      .capability:nth-child(1) {
+        animation: fade-up 0.55s ease 0.7s forwards;
       }
 
-      .cap-chip:nth-child(2) {
-        animation: fadeSlideUp 0.55s ease 0.76s forwards;
+      .capability:nth-child(2) {
+        animation: fade-up 0.55s ease 0.78s forwards;
       }
 
-      .cap-chip:nth-child(3) {
-        animation: fadeSlideUp 0.55s ease 0.82s forwards;
+      .capability:nth-child(3) {
+        animation: fade-up 0.55s ease 0.86s forwards;
       }
 
-      .cap-chip:nth-child(4) {
-        animation: fadeSlideUp 0.55s ease 0.88s forwards;
+      .capability:nth-child(4) {
+        animation: fade-up 0.55s ease 0.94s forwards;
       }
 
       .cap-dot {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         flex: none;
       }
 
       .cap-dot.teal {
         background: var(--teal);
-        box-shadow: 0 0 16px rgba(6, 182, 212, 0.45);
+        box-shadow: 0 0 16px rgba(6, 182, 212, 0.42);
       }
 
       .cap-dot.orange {
         background: var(--accent);
-        box-shadow: 0 0 16px rgba(249, 115, 22, 0.4);
+        box-shadow: 0 0 16px rgba(249, 115, 22, 0.42);
       }
 
       .hero-actions {
+        position: relative;
+        z-index: 1;
         display: flex;
         flex-wrap: wrap;
         gap: 14px;
+        margin-top: 34px;
         opacity: 0;
-        transform: translateY(12px);
-        animation: fadeSlideUp 0.6s ease 0.96s forwards;
+        transform: translateY(14px);
+        animation: fade-up 0.65s ease 1.02s forwards;
       }
 
       .cta-primary,
@@ -448,109 +605,129 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 52px;
-        padding: 0 22px;
-        border-radius: 6px;
+        min-height: 54px;
+        padding: 0 24px;
         font-weight: 700;
         transition:
-          border-color 0.2s ease,
-          background 0.2s ease,
-          box-shadow 0.2s ease,
           transform 0.2s ease,
+          background 0.2s ease,
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
           color 0.2s ease;
       }
 
       .cta-primary {
-        background: var(--accent);
-        color: var(--bg);
-        box-shadow: 0 0 0 transparent;
+        border-radius: 16px 10px 16px 10px;
+        background: linear-gradient(180deg, #ff8f37, var(--accent));
+        color: #07090d;
       }
 
       .cta-primary:hover {
-        background: var(--accent-strong);
-        box-shadow: 0 0 24px rgba(249, 115, 22, 0.35);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 0 28px rgba(249, 115, 22, 0.32);
       }
 
       .cta-secondary {
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.025);
         color: var(--text-primary);
-        background: rgba(255, 255, 255, 0.03);
       }
 
       .cta-secondary:hover {
-        border-color: rgba(6, 182, 212, 0.28);
-        color: var(--teal);
+        transform: translateY(-2px);
+        border-color: rgba(6, 182, 212, 0.3);
         background: rgba(6, 182, 212, 0.04);
-        transform: translateY(-1px);
+        color: var(--teal);
       }
 
-      .hero-side {
+      .hero-right {
+        position: relative;
         display: flex;
         flex-direction: column;
         gap: 22px;
+        padding-top: 18px;
       }
 
-      .panel {
+      .slab {
         position: relative;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: var(--surface-1);
-        box-shadow: var(--shadow-panel);
+        overflow: hidden;
+        border: 1px solid var(--slab-border);
+        background: var(--slab-bg);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--slab-shadow);
       }
 
-      .intelligence-panel {
-        padding: 24px;
-        box-shadow:
-          0 0 80px rgba(6, 182, 212, 0.06),
-          0 0 0 1px rgba(255, 255, 255, 0.07),
-          var(--shadow-panel);
+      .slab::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: var(--slab-outline);
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
       }
 
-      .panel-head {
+      .what-slab {
+        border-radius: 34px 20px 34px 14px;
+        padding: 26px 26px 18px;
+      }
+
+      .install-slab {
+        border-radius: 12px 34px 28px 28px;
+        padding: 24px 26px 26px;
+        background: var(--install-slab-bg);
+      }
+
+      .slab-head {
         display: flex;
         align-items: center;
         gap: 10px;
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
       }
 
-      .panel-head.orange {
+      .slab-head.orange {
         color: var(--accent);
       }
 
-      .panel-head.teal {
+      .slab-head.teal {
         color: var(--teal);
       }
 
-      .panel-head svg {
-        width: 15px;
-        height: 15px;
+      .slab-head svg {
+        width: 14px;
+        height: 14px;
       }
 
-      .task-queue {
+      .what-list {
         margin-top: 18px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
       }
 
-      .queue-row {
+      .what-row {
         display: grid;
-        grid-template-columns: 22px 1fr;
+        grid-template-columns: 24px 1fr;
         gap: 14px;
         align-items: start;
-        padding: 17px 14px 17px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 18px 0;
+        border-top: 1px solid var(--row-separator);
         opacity: 0;
         clip-path: inset(0 100% 0 0);
         transform: translateX(-8px);
         transition:
           background 0.2s ease,
+          padding-left 0.2s ease,
           border-left-color 0.2s ease;
       }
 
-      .queue-row.visible {
+      .what-row.visible {
         opacity: 1;
         clip-path: inset(0 0 0 0);
         transform: translateX(0);
@@ -559,36 +736,29 @@
           clip-path 0.45s ease,
           transform 0.45s ease,
           background 0.2s ease,
+          padding-left 0.2s ease,
           border-left-color 0.2s ease;
       }
 
-      .queue-row:hover {
-        background: rgba(6, 182, 212, 0.04);
+      .what-row:hover {
+        background: rgba(6, 182, 212, 0.035);
         border-left: 2px solid rgba(6, 182, 212, 0.4);
         padding-left: 12px;
       }
 
-      .queue-led {
-        width: 8px;
-        height: 8px;
+      .what-led {
+        width: 10px;
+        height: 10px;
         margin-top: 8px;
         border-radius: 50%;
         border: 1.5px solid var(--teal);
-        box-shadow: 0 0 14px rgba(6, 182, 212, 0.28);
-        animation: queuePulse 2.2s ease-out infinite;
+        box-shadow: 0 0 16px rgba(6, 182, 212, 0.26);
+        animation: queue-pulse 2.2s ease-out infinite;
       }
 
-      .queue-copy {
-        color: #cbd5e1;
-        font-size: 0.98rem;
-        line-height: 1.7;
-      }
-
-      .install-panel {
-        padding: 24px;
-        background:
-          linear-gradient(180deg, rgba(6, 182, 212, 0.04), rgba(17, 21, 32, 0.88)),
-          var(--surface-2);
+      .what-copy {
+        color: var(--what-copy);
+        line-height: 1.82;
       }
 
       .install-timeline {
@@ -596,107 +766,103 @@
         display: flex;
         flex-direction: column;
         gap: 18px;
-        margin-top: 18px;
-        padding-left: 20px;
+        margin-top: 20px;
+        padding-left: 18px;
       }
 
       .install-timeline::before {
         content: "";
         position: absolute;
         left: 11px;
-        top: 3px;
-        bottom: 3px;
+        top: 6px;
+        bottom: 8px;
         width: 1px;
-        background: rgba(6, 182, 212, 0.2);
+        background: linear-gradient(180deg, rgba(6, 182, 212, 0.3), rgba(6, 182, 212, 0.08));
         transform-origin: top;
-        transform: scaleY(1);
       }
 
-      .timeline-step {
-        position: relative;
+      .install-step {
         display: grid;
-        grid-template-columns: 34px 1fr;
-        gap: 14px;
+        grid-template-columns: 36px 1fr;
+        gap: 12px;
         align-items: start;
       }
 
-      .timeline-index {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+      .install-index {
         width: 22px;
         height: 22px;
         margin-top: 2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 50%;
-        border: 1px solid rgba(6, 182, 212, 0.38);
-        background: rgba(6, 182, 212, 0.06);
+        border: 1px solid rgba(6, 182, 212, 0.34);
+        background: rgba(6, 182, 212, 0.08);
         color: var(--teal);
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
       }
 
-      .timeline-copy {
+      .install-copy {
         color: var(--text-secondary);
-        font-size: 0.97rem;
-        line-height: 1.75;
+        line-height: 1.82;
       }
 
-      .console-section {
-        background: var(--surface-1);
-        padding: 72px 0 88px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      .surfaces {
+        position: relative;
+        padding: 76px 0 96px;
       }
 
-      .console-grid {
+      .surfaces::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: var(--surface-section-wash);
+        pointer-events: none;
+      }
+
+      .surfaces-grid {
+        position: relative;
         display: grid;
-        grid-template-columns: minmax(0, 0.6fr) minmax(300px, 0.4fr);
-        gap: 28px;
+        grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.86fr);
+        gap: 40px;
+        align-items: start;
       }
 
-      .section-card {
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 18px;
-        background: var(--surface-2);
-        padding: 28px;
-        box-shadow: 0 20px 64px rgba(0, 0, 0, 0.24);
+      .surfaces-left {
+        position: relative;
       }
 
-      .section-head {
+      .section-label {
         font-family: "JetBrains Mono", monospace;
         font-size: 11px;
-        letter-spacing: 0.1em;
+        color: var(--accent);
+        letter-spacing: 0.14em;
         text-transform: uppercase;
       }
 
-      .section-head.orange {
-        color: var(--accent);
-      }
-
-      .section-head.teal {
-        color: var(--teal);
-      }
-
-      .surface-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+      .surface-stack {
         margin-top: 20px;
+        display: flex;
+        flex-direction: column;
       }
 
       .surface-card {
         position: relative;
-        overflow: hidden;
-        min-height: 142px;
-        padding: 18px 18px 18px 20px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        background: var(--surface-1);
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+        padding: 22px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         opacity: 0;
         transform: translateY(12px);
         transition:
-          border-color 0.2s ease,
           transform 0.2s ease,
-          box-shadow 0.2s ease;
+          padding-left 0.2s ease;
       }
 
       .surface-card.visible {
@@ -705,67 +871,101 @@
         transition:
           opacity 0.45s ease,
           transform 0.45s ease,
-          border-color 0.2s ease,
-          box-shadow 0.2s ease;
+          padding-left 0.2s ease;
       }
 
-      .surface-card::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: var(--surface-color, var(--muted-accent));
+      .surface-card:first-child {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
       }
 
       .surface-card:hover {
-        border-color: color-mix(in srgb, var(--surface-color, var(--muted-accent)) 45%, white 10%);
-        transform: translateY(-2px);
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+        padding-left: 10px;
+      }
+
+      .surface-tag {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding-top: 2px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--surface-color);
+      }
+
+      .surface-tag::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--surface-color);
+        box-shadow: 0 0 18px var(--surface-glow);
+      }
+
+      .surface-body {
+        position: relative;
+      }
+
+      .surface-body::before {
+        content: "";
+        position: absolute;
+        right: -14px;
+        top: 50%;
+        width: 110px;
+        height: 110px;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--surface-glow), transparent 70%);
+        opacity: 0.8;
+        pointer-events: none;
       }
 
       .surface-card h3 {
+        position: relative;
+        z-index: 1;
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.18rem;
         font-weight: 600;
-        color: var(--text-primary);
       }
 
       .surface-card p {
-        margin: 12px 0 0;
+        position: relative;
+        z-index: 1;
+        margin: 10px 0 0;
+        max-width: 34ch;
         color: var(--text-secondary);
-        font-size: 0.94rem;
-        line-height: 1.75;
+        line-height: 1.82;
+      }
+
+      .built-right {
+        position: relative;
+        padding-top: 2px;
       }
 
       .built-copy {
-        margin-top: 18px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 22px;
+        margin-top: 20px;
       }
 
       .built-copy p {
         margin: 0;
         color: var(--text-secondary);
-        font-size: 1rem;
-        line-height: 1.9;
+        line-height: 2;
       }
 
       .build-status {
-        margin-top: 20px;
-        border-radius: 10px;
-        border: 1px solid rgba(34, 197, 94, 0.2);
-        background: rgba(0, 0, 0, 0.3);
-        overflow: hidden;
+        margin-top: 28px;
+        border-left: 1px solid rgba(34, 197, 94, 0.24);
+        padding-left: 24px;
       }
 
-      .build-status-head {
-        padding: 16px 18px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        color: var(--text-primary);
+      .build-head {
         font-weight: 600;
+        margin-bottom: 16px;
       }
 
       .status-row {
@@ -773,21 +973,8 @@
         grid-template-columns: 18px 1fr;
         gap: 12px;
         align-items: start;
-        padding: 14px 18px;
-        border-left: 0 solid rgba(34, 197, 94, 0.3);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        transition:
-          background 0.2s ease,
-          border-left-width 0.2s ease;
-      }
-
-      .status-row:last-child {
-        border-bottom: 0;
-      }
-
-      .status-row:hover {
-        background: rgba(34, 197, 94, 0.04);
-        border-left-width: 2px;
+        padding: 14px 0;
+        border-top: 1px solid var(--row-separator);
       }
 
       .status-row svg {
@@ -798,12 +985,11 @@
       }
 
       .status-row span {
-        color: #cbd5e1;
-        font-size: 0.94rem;
-        line-height: 1.65;
+        color: var(--surface-copy);
+        line-height: 1.74;
       }
 
-      .reveal-line,
+      .reveal,
       .fade-in {
         opacity: 1;
       }
@@ -811,21 +997,21 @@
       @supports (animation-timeline: view()) {
         .reveal {
           clip-path: inset(0 0 100% 0);
-          animation: revealClip linear both;
+          animation: reveal-clip linear both;
           animation-timeline: view();
           animation-range: entry 0% entry 65%;
         }
 
         .fade-in {
           opacity: 0;
-          animation: fadeIn linear both;
+          animation: scroll-fade linear both;
           animation-timeline: view();
           animation-range: entry 0% entry 55%;
         }
 
         .install-timeline::before {
           transform: scaleY(0);
-          animation: drawLine linear both;
+          animation: draw-line linear both;
           animation-timeline: view();
           animation-range: entry 0% entry 70%;
         }
@@ -842,11 +1028,11 @@
         opacity: 0;
         transition:
           opacity 0.18s ease,
-          transform 0.18s ease,
+          width 0.18s ease,
+          height 0.18s ease,
           background 0.18s ease,
           border-color 0.18s ease,
-          width 0.18s ease,
-          height 0.18s ease;
+          transform 0.18s ease;
       }
 
       .cursor-dot {
@@ -883,25 +1069,21 @@
         transform: translate(-50%, -50%) scale(0.55);
       }
 
-      .mobile-drawer {
-        display: none;
-      }
-
-      @keyframes gridDrift {
+      @keyframes grid-drift {
         from {
-          background-position: 0 0, 0 0, 0 0;
+          background-position: 0 0, 0 0;
         }
         to {
-          background-position: 0 -44px, 44px 0, 0 -28px;
+          background-position: 0 -56px, 56px 0;
         }
       }
 
-      @keyframes livePulse {
+      @keyframes live-pulse {
         0% {
           box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
         }
         70% {
-          box-shadow: 0 0 0 9px rgba(34, 197, 94, 0);
+          box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
         }
         100% {
           box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
@@ -917,51 +1099,42 @@
         }
       }
 
-      @keyframes badgeIn {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes headlineReveal {
+      @keyframes headline-reveal {
         to {
           clip-path: inset(0 0 0 0);
         }
       }
 
-      @keyframes fadeSlideUp {
+      @keyframes fade-up {
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
 
-      @keyframes queuePulse {
+      @keyframes queue-pulse {
         0%,
         100% {
           transform: scale(1);
-          opacity: 0.9;
         }
         50% {
           transform: scale(1.18);
-          opacity: 1;
         }
       }
 
-      @keyframes revealClip {
+      @keyframes reveal-clip {
         to {
           clip-path: inset(0 0 0 0);
         }
       }
 
-      @keyframes fadeIn {
+      @keyframes scroll-fade {
         to {
           opacity: 1;
         }
       }
 
-      @keyframes drawLine {
+      @keyframes draw-line {
         to {
           transform: scaleY(1);
         }
@@ -976,26 +1149,27 @@
           scroll-behavior: auto !important;
         }
 
-        .queue-row,
-        .cap-chip,
-        .surface-card,
+        .eyebrow,
         .hero-body,
         .hero-actions,
-        .eyebrow-terminal {
+        .capability,
+        .what-row,
+        .surface-card {
           opacity: 1 !important;
           transform: none !important;
           clip-path: none !important;
         }
       }
 
-      @media (max-width: 980px) {
+      @media (max-width: 1080px) {
         .hero-grid,
-        .console-grid {
+        .surfaces-grid {
           grid-template-columns: 1fr;
         }
 
-        .hero-side {
-          max-width: 760px;
+        .hero-left::before {
+          width: 100%;
+          left: -10px;
         }
       }
 
@@ -1008,13 +1182,13 @@
           min-height: 68px;
         }
 
-        .live-pill,
+        .system-live,
         .status-strip,
-        .nav-links {
+        .nav-actions {
           display: none;
         }
 
-        .menu-button {
+        .menu-toggle {
           display: inline-flex;
         }
 
@@ -1024,12 +1198,12 @@
           top: calc(100% + 8px);
           left: 14px;
           right: 14px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-          background: rgba(12, 15, 21, 0.96);
-          backdrop-filter: blur(20px);
-          box-shadow: 0 26px 60px rgba(0, 0, 0, 0.28);
           padding: 12px;
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--mobile-drawer-bg);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
           opacity: 0;
           pointer-events: none;
           transform: translateY(-8px);
@@ -1049,9 +1223,15 @@
           align-items: center;
           justify-content: space-between;
           padding: 14px 12px;
-          border-radius: 10px;
+          border-radius: 12px;
           color: var(--text-secondary);
           font-weight: 500;
+        }
+
+        .mobile-drawer .theme-toggle {
+          width: 100%;
+          justify-content: center;
+          margin-bottom: 6px;
         }
 
         .mobile-drawer a + a {
@@ -1060,55 +1240,85 @@
 
         .mobile-drawer .launch-link {
           width: 100%;
-          margin-top: 8px;
-          color: var(--bg);
+          margin-top: 6px;
+          color: #07090d;
         }
 
         .hero {
-          padding: clamp(32px, 7vw, 42px) 0 clamp(44px, 8vw, 56px);
+          padding: clamp(28px, 7vw, 38px) 0 clamp(54px, 9vw, 64px);
         }
 
-        .hero-copy {
-          padding-top: 18px;
-          gap: 20px;
+        .hero-grid {
+          gap: 26px;
         }
 
-        .capability-grid,
-        .surface-grid {
-          grid-template-columns: 1fr;
+        .hero-left {
+          padding-top: 22px;
         }
 
-        .panel,
-        .section-card {
-          padding: clamp(20px, 4vw, 24px);
-        }
-
-        .console-section {
-          padding: clamp(44px, 8vw, 56px) 0 clamp(54px, 8vw, 64px);
+        .hero-left::before {
+          left: -8px;
+          top: 0;
+          height: 540px;
+          border-radius: 72px 24px 110px 24px;
         }
 
         .hero-title {
-          font-size: clamp(2.5rem, 10vw, 4rem);
+          font-size: clamp(2.9rem, 10vw, 4.8rem);
+        }
+
+        .capabilities {
+          max-width: none;
+        }
+
+        .hero-right {
+          gap: 16px;
+        }
+
+        .slab,
+        .surfaces-grid {
+          padding: 0;
+        }
+
+        .surfaces {
+          padding: clamp(56px, 9vw, 68px) 0 clamp(64px, 9vw, 78px);
+        }
+
+        .surface-card {
+          grid-template-columns: 1fr;
+          gap: 10px;
+          padding: 18px 0;
+        }
+
+        .surface-body p {
+          max-width: none;
         }
       }
     </style>
   </head>
   <body>
-    <div class="page-shell">
+    <div class="page">
       <header class="site-nav" id="site-nav">
         <div class="container nav-inner">
-          <div class="brand">
-            <div class="brand-block">
+          <div class="brand-wrap">
+            <div class="brand-stack">
               <div class="brand-mark">FORGE</div>
-              <div class="brand-subtitle">AI Forward Deployed Engineer</div>
+              <div class="brand-sub">AI FORWARD DEPLOYED ENGINEER</div>
             </div>
-            <div class="live-pill">
-              <span class="live-dot"></span>
-              <span>System live</span>
-            </div>
+            <div class="system-live">SYSTEM LIVE</div>
           </div>
 
-          <nav class="nav-links" aria-label="Primary">
+          <nav class="nav-actions" aria-label="Primary">
+            <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path
+                  d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8Z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                ></path>
+              </svg>
+              <span>Theme</span>
+            </button>
             <a
               class="nav-link"
               href="https://github.com/Whauv/Forge"
@@ -1118,7 +1328,7 @@
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path
                   d="M12 2C6.477 2 2 6.59 2 12.252c0 4.53 2.865 8.37 6.839 9.727.5.096.683-.223.683-.495 0-.245-.008-.894-.013-1.754-2.782.618-3.369-1.377-3.369-1.377-.455-1.176-1.11-1.49-1.11-1.49-.908-.636.069-.623.069-.623 1.004.072 1.532 1.059 1.532 1.059.892 1.568 2.341 1.115 2.91.852.091-.664.35-1.116.636-1.373-2.22-.258-4.555-1.14-4.555-5.072 0-1.12.39-2.035 1.03-2.753-.104-.261-.447-1.307.097-2.726 0 0 .84-.276 2.75 1.052A9.36 9.36 0 0 1 12 6.838a9.36 9.36 0 0 1 2.504.348c1.909-1.328 2.748-1.052 2.748-1.052.546 1.419.203 2.465.1 2.726.64.718 1.028 1.633 1.028 2.753 0 3.942-2.339 4.811-4.566 5.064.36.321.68.954.68 1.922 0 1.388-.012 2.508-.012 2.85 0 .275.18.596.688.494C19.138 20.619 22 16.78 22 12.252 22 6.59 17.523 2 12 2Z"
-                />
+                ></path>
               </svg>
               <span>GitHub repo</span>
             </a>
@@ -1133,12 +1343,12 @@
           </nav>
 
           <button
-            class="menu-button"
+            class="menu-toggle"
             type="button"
+            id="menu-toggle"
             aria-label="Open navigation menu"
             aria-expanded="false"
             aria-controls="mobile-drawer"
-            id="menu-toggle"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M4 7h16M4 12h16M4 17h16"></path>
@@ -1147,11 +1357,17 @@
         </div>
 
         <div class="mobile-drawer" id="mobile-drawer">
-          <a
-            href="https://github.com/Whauv/Forge"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <button class="theme-toggle" type="button" id="theme-toggle-mobile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path
+                d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 1 0 9.8 9.8Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+            <span>Theme</span>
+          </button>
+          <a href="https://github.com/Whauv/Forge" target="_blank" rel="noopener noreferrer">
             <span>GitHub repo</span>
             <span>&nearr;</span>
           </a>
@@ -1167,11 +1383,11 @@
 
         <div class="status-strip">
           <div class="status-track">
-            <div class="status-content">
-              FORGE v1.0 · FastAPI + Qdrant + Supabase + Gemini · AutoPilot Console Active · Vector search ready
+            <div class="status-copy">
+              FORGE v1.0 &#183; FastAPI + Qdrant + Supabase + Gemini &#183; AutoPilot Console Active &#183; Vector search ready
             </div>
-            <div class="status-content">
-              FORGE v1.0 · FastAPI + Qdrant + Supabase + Gemini · AutoPilot Console Active · Vector search ready
+            <div class="status-copy">
+              FORGE v1.0 &#183; FastAPI + Qdrant + Supabase + Gemini &#183; AutoPilot Console Active &#183; Vector search ready
             </div>
           </div>
         </div>
@@ -1179,8 +1395,8 @@
 
       <section class="hero">
         <div class="container hero-grid">
-          <div class="hero-copy">
-            <div class="eyebrow-terminal">FROM CODEBASE CONTEXT TO DEPLOYABLE OUTPUT</div>
+          <div class="hero-left">
+            <div class="eyebrow">FROM CODEBASE CONTEXT TO DEPLOYABLE OUTPUT</div>
 
             <h1 class="hero-title reveal">
               <span class="line"><span>A product front door for</span></span>
@@ -1193,20 +1409,20 @@
               Forge ingests repositories and docs, retrieves relevant code context from a vector store, analyzes client problems, proposes implementation tasks, and walks projects through coding, testing, and deployment with an operator console on top.
             </p>
 
-            <div class="capability-grid">
-              <div class="cap-chip fade-in">
+            <div class="capabilities">
+              <div class="capability fade-in">
                 <span class="cap-dot orange"></span>
                 <span>Repo + docs ingestion</span>
               </div>
-              <div class="cap-chip fade-in">
+              <div class="capability fade-in">
                 <span class="cap-dot teal"></span>
                 <span>Gemini-powered analysis</span>
               </div>
-              <div class="cap-chip fade-in">
+              <div class="capability fade-in">
                 <span class="cap-dot teal"></span>
                 <span>Task graph and diff review</span>
               </div>
-              <div class="cap-chip fade-in">
+              <div class="capability fade-in">
                 <span class="cap-dot orange"></span>
                 <span>Code, test, and deploy workflow</span>
               </div>
@@ -1232,77 +1448,77 @@
             </div>
           </div>
 
-          <div class="hero-side">
-            <article class="panel intelligence-panel fade-in">
-              <div class="panel-head orange">
+          <div class="hero-right">
+            <article class="slab what-slab fade-in">
+              <div class="slab-head orange">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                   <path d="M12 3l7 4v5c0 4.97-2.98 7.99-7 9-4.02-1.01-7-4.03-7-9V7l7-4Z"></path>
                 </svg>
-                <span>What It Does</span>
+                <span>WHAT IT DOES</span>
               </div>
 
-              <div class="task-queue">
-                <div class="queue-row js-queue-row">
-                  <span class="queue-led"></span>
-                  <div class="queue-copy">
+              <div class="what-list">
+                <div class="what-row js-queue-row">
+                  <span class="what-led"></span>
+                  <div class="what-copy">
                     Ingests GitHub repositories, documentation URLs, and raw project context.
                   </div>
                 </div>
-                <div class="queue-row js-queue-row">
-                  <span class="queue-led"></span>
-                  <div class="queue-copy">
+                <div class="what-row js-queue-row">
+                  <span class="what-led"></span>
+                  <div class="what-copy">
                     Builds vector-searchable context with Qdrant and structured records in Supabase.
                   </div>
                 </div>
-                <div class="queue-row js-queue-row">
-                  <span class="queue-led"></span>
-                  <div class="queue-copy">
+                <div class="what-row js-queue-row">
+                  <span class="what-led"></span>
+                  <div class="what-copy">
                     Generates analysis, implementation tasks, code diffs, test runs, and deployment handoff.
                   </div>
                 </div>
-                <div class="queue-row js-queue-row">
-                  <span class="queue-led"></span>
-                  <div class="queue-copy">
+                <div class="what-row js-queue-row">
+                  <span class="what-led"></span>
+                  <div class="what-copy">
                     Lets operators review tasks, artifacts, live pipeline status, and deployment outcomes from AutoPilot.
                   </div>
                 </div>
               </div>
             </article>
 
-            <article class="panel install-panel fade-in">
-              <div class="panel-head teal">
+            <article class="slab install-slab fade-in">
+              <div class="slab-head teal">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
                   <path d="M12 4v16M6 10l6-6 6 6M6 14l6 6 6-6"></path>
                 </svg>
-                <span>Install Overview</span>
+                <span>INSTALL OVERVIEW</span>
               </div>
 
               <div class="install-timeline reveal">
-                <div class="timeline-step fade-in">
-                  <span class="timeline-index">1</span>
-                  <div class="timeline-copy">Clone the Forge repository from GitHub.</div>
+                <div class="install-step fade-in">
+                  <span class="install-index">1</span>
+                  <div class="install-copy">Clone the Forge repository from GitHub.</div>
                 </div>
-                <div class="timeline-step fade-in">
-                  <span class="timeline-index">2</span>
-                  <div class="timeline-copy">
+                <div class="install-step fade-in">
+                  <span class="install-index">2</span>
+                  <div class="install-copy">
                     Set backend env vars for Qdrant, Supabase, Gemini, GitHub, Firecrawl, and E2B.
                   </div>
                 </div>
-                <div class="timeline-step fade-in">
-                  <span class="timeline-index">3</span>
-                  <div class="timeline-copy">
+                <div class="install-step fade-in">
+                  <span class="install-index">3</span>
+                  <div class="install-copy">
                     Set frontend env vars for Supabase, Resend, and the backend URL.
                   </div>
                 </div>
-                <div class="timeline-step fade-in">
-                  <span class="timeline-index">4</span>
-                  <div class="timeline-copy">
+                <div class="install-step fade-in">
+                  <span class="install-index">4</span>
+                  <div class="install-copy">
                     Run the Supabase migrations in `autopilot/supabase/migrations`.
                   </div>
                 </div>
-                <div class="timeline-step fade-in">
-                  <span class="timeline-index">5</span>
-                  <div class="timeline-copy">
+                <div class="install-step fade-in">
+                  <span class="install-index">5</span>
+                  <div class="install-copy">
                     Start the FastAPI backend, then launch the Next.js AutoPilot console.
                   </div>
                 </div>
@@ -1312,41 +1528,82 @@
         </div>
       </section>
 
-      <section class="console-section">
-        <div class="container console-grid">
-          <article class="section-card fade-in">
-            <div class="section-head orange reveal">Product Surfaces</div>
+      <section class="surfaces">
+        <div class="container surfaces-grid">
+          <div class="surfaces-left">
+            <div class="section-label reveal">PRODUCT SURFACES</div>
 
-            <div class="surface-grid">
-              <div class="surface-card js-surface-card fade-in" style="--surface-color: #f97316;">
-                <h3>Projects</h3>
-                <p>Onboard repos, docs, and problem statements.</p>
+            <div class="surface-stack">
+              <div
+                class="surface-card js-surface-card fade-in"
+                style="--surface-color:#f97316; --surface-glow:rgba(249,115,22,0.14);"
+              >
+                <div class="surface-tag">Projects</div>
+                <div class="surface-body">
+                  <h3>Projects</h3>
+                  <p>Onboard repos, docs, and problem statements.</p>
+                </div>
               </div>
-              <div class="surface-card js-surface-card fade-in" style="--surface-color: #06b6d4;">
-                <h3>Analysis</h3>
-                <p>Stream AI findings and solution framing.</p>
+
+              <div
+                class="surface-card js-surface-card fade-in"
+                style="--surface-color:#06b6d4; --surface-glow:rgba(6,182,212,0.14);"
+              >
+                <div class="surface-tag">Analysis</div>
+                <div class="surface-body">
+                  <h3>Analysis</h3>
+                  <p>Stream AI findings and solution framing.</p>
+                </div>
               </div>
-              <div class="surface-card js-surface-card fade-in" style="--surface-color: #f59e0b;">
-                <h3>Tasks</h3>
-                <p>Approve or reject generated implementation work.</p>
+
+              <div
+                class="surface-card js-surface-card fade-in"
+                style="--surface-color:#f59e0b; --surface-glow:rgba(245,158,11,0.14);"
+              >
+                <div class="surface-tag">Tasks</div>
+                <div class="surface-body">
+                  <h3>Tasks</h3>
+                  <p>Approve or reject generated implementation work.</p>
+                </div>
               </div>
-              <div class="surface-card js-surface-card fade-in" style="--surface-color: #22c55e;">
-                <h3>Artifacts</h3>
-                <p>Inspect diffs, logs, and proceed gates.</p>
+
+              <div
+                class="surface-card js-surface-card fade-in"
+                style="--surface-color:#22c55e; --surface-glow:rgba(34,197,94,0.14);"
+              >
+                <div class="surface-tag">Artifacts</div>
+                <div class="surface-body">
+                  <h3>Artifacts</h3>
+                  <p>Inspect diffs, logs, and proceed gates.</p>
+                </div>
               </div>
-              <div class="surface-card js-surface-card fade-in" style="--surface-color: #a78bfa;">
-                <h3>Run Console</h3>
-                <p>Track pipeline steps across projects.</p>
+
+              <div
+                class="surface-card js-surface-card fade-in"
+                style="--surface-color:#8b5cf6; --surface-glow:rgba(139,92,246,0.14);"
+              >
+                <div class="surface-tag">Run Console</div>
+                <div class="surface-body">
+                  <h3>Run Console</h3>
+                  <p>Track pipeline steps across projects.</p>
+                </div>
               </div>
-              <div class="surface-card js-surface-card fade-in" style="--surface-color: #64748b;">
-                <h3>History</h3>
-                <p>Review prior deployment outcomes.</p>
+
+              <div
+                class="surface-card js-surface-card fade-in"
+                style="--surface-color:#64748b; --surface-glow:rgba(100,116,139,0.14);"
+              >
+                <div class="surface-tag">History</div>
+                <div class="surface-body">
+                  <h3>History</h3>
+                  <p>Review prior deployment outcomes.</p>
+                </div>
               </div>
             </div>
-          </article>
+          </div>
 
-          <article class="section-card fade-in">
-            <div class="section-head orange reveal">Built So Far</div>
+          <div class="built-right">
+            <div class="section-label reveal">BUILT SO FAR</div>
 
             <div class="built-copy">
               <p class="fade-in">
@@ -1358,7 +1615,7 @@
             </div>
 
             <div class="build-status fade-in">
-              <div class="build-status-head">Current build includes</div>
+              <div class="build-head">Current build includes</div>
               <div class="status-row">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20 6 9 17l-5-5"></path>
@@ -1390,24 +1647,54 @@
                 <span>Deployment visibility and pipeline status</span>
               </div>
             </div>
-          </article>
+          </div>
         </div>
       </section>
     </div>
 
     <script>
+      const THEME_KEY = "forge-landing-theme";
       const nav = document.getElementById("site-nav");
       const menuToggle = document.getElementById("menu-toggle");
       const mobileDrawer = document.getElementById("mobile-drawer");
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeToggleMobile = document.getElementById("theme-toggle-mobile");
       const queueRows = document.querySelectorAll(".js-queue-row");
       const surfaceCards = document.querySelectorAll(".js-surface-card");
 
+      function getPreferredTheme() {
+        const savedTheme = window.localStorage.getItem(THEME_KEY);
+        if (savedTheme === "light" || savedTheme === "dark") return savedTheme;
+        return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+
+      function syncThemeButtons(theme) {
+        [themeToggle, themeToggleMobile].forEach((button) => {
+          if (!button) return;
+          button.setAttribute("aria-pressed", String(theme === "light"));
+          const label = theme === "light" ? "Light mode" : "Dark mode";
+          const copy = button.querySelector("span");
+          if (copy) copy.textContent = label;
+          button.setAttribute("aria-label", "Switch to " + (theme === "light" ? "dark" : "light") + " theme");
+        });
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        window.localStorage.setItem(THEME_KEY, theme);
+        syncThemeButtons(theme);
+      }
+
+      function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(currentTheme === "dark" ? "light" : "dark");
+      }
+
+      applyTheme(getPreferredTheme());
+
       function updateNavState() {
-        if (window.scrollY > 8) {
-          nav.classList.add("scrolled");
-        } else {
-          nav.classList.remove("scrolled");
-        }
+        if (window.scrollY > 8) nav.classList.add("scrolled");
+        else nav.classList.remove("scrolled");
       }
 
       updateNavState();
@@ -1427,16 +1714,17 @@
         });
       }
 
+      [themeToggle, themeToggleMobile].forEach((button) => {
+        if (!button) return;
+        button.addEventListener("click", toggleTheme);
+      });
+
       queueRows.forEach((row, index) => {
-        setTimeout(() => {
-          row.classList.add("visible");
-        }, 150 * index + 200);
+        setTimeout(() => row.classList.add("visible"), 150 * index + 220);
       });
 
       surfaceCards.forEach((card, index) => {
-        setTimeout(() => {
-          card.classList.add("visible");
-        }, 80 * index + 300);
+        setTimeout(() => card.classList.add("visible"), 90 * index + 340);
       });
 
       if (window.matchMedia("(pointer: fine)").matches) {
