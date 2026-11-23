@@ -40,7 +40,9 @@ class IngestAgent:
             raw_text = payload.get("raw_text")
 
             if not repo_url and not doc_urls and not raw_text:
-                raise ValueError("At least one of repo_url, doc_urls, or raw_text must be provided.")
+                raise ValueError(
+                    "At least one of repo_url, doc_urls, or raw_text must be provided."
+                )
 
             documents: list[dict[str, Any]] = []
 
@@ -90,7 +92,9 @@ class IngestAgent:
             return {"status": "error", "message": str(exc)}
 
     async def _fetch_repo_documents(self, repo_url: str) -> list[dict[str, Any]]:
-        repo = await asyncio.to_thread(self.github_client.get_repo, parse_github_repo_name(repo_url))
+        repo = await asyncio.to_thread(
+            self.github_client.get_repo, parse_github_repo_name(repo_url)
+        )
         documents: list[dict[str, Any]] = []
         queue = list(await asyncio.to_thread(repo.get_contents, ""))
 

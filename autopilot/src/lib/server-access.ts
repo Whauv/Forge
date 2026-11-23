@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 
+import { loadOwnedProject, type OwnedProject } from "@/lib/queries";
 import { createRouteHandlerSupabaseClient, createServerSupabaseClient } from "@/lib/supabase";
-import type { DeploymentRow, ProjectRow } from "@/types/db";
-
-type OwnedProject = Pick<
-  ProjectRow,
-  "id" | "user_id" | "name" | "github_repo_url" | "problem_description" | "created_at"
->;
+import type { DeploymentRow } from "@/types/db";
 
 type RouteAuthFailure = {
   response: NextResponse;
@@ -37,13 +33,11 @@ export async function requireServerSessionOrRedirect() {
 
 export async function requireOwnedProjectOrRedirect(projectId: string) {
   const { supabase, session } = await requireServerSessionOrRedirect();
-  const { data: project, error } = await supabase
-    .from("projects")
-    .select("id,user_id,name,github_repo_url,problem_description,created_at")
-    .eq("id", projectId)
-    .eq("user_id", session.user.id)
-    .returns<OwnedProject[]>()
-    .maybeSingle();
+  const { data: project, error } = await loadOwnedProject(
+    supabase,
+    projectId,
+    session.user.id,
+  );
 
   if (error) {
     throw new Error(error.message);
@@ -84,13 +78,7 @@ export async function requireOwnedProjectForRoute(
   }
 
   const { supabase, userId } = auth;
-  const { data: project, error } = await supabase
-    .from("projects")
-    .select("id,user_id,name,github_repo_url,problem_description,created_at")
-    .eq("id", projectId)
-    .eq("user_id", userId)
-    .returns<OwnedProject[]>()
-    .maybeSingle();
+  const { data: project, error } = await loadOwnedProject(supabase, projectId, userId);
 
   if (error) {
     return {

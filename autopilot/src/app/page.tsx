@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase";
+import { GITHUB_REPO_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function Home() {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href="https://github.com/Whauv/Forge"
+              href={GITHUB_REPO_URL}
               target="_blank"
               rel="noreferrer"
               className="rounded-full border border-[#14213d]/12 bg-white/70 px-4 py-2 text-sm font-semibold transition hover:border-[#ff7a18] hover:text-[#d95d00] dark:border-white/12 dark:bg-white/6 dark:hover:border-[#ff9b52] dark:hover:text-[#ffb276]"
@@ -84,7 +85,7 @@ export default async function Home() {
                 {productLabel}
               </a>
               <a
-                href="https://github.com/Whauv/Forge"
+                href={GITHUB_REPO_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center rounded-full border border-[#14213d]/12 px-6 py-4 text-sm font-semibold transition hover:border-[#ff7a18] hover:text-[#d95d00] dark:border-white/12 dark:hover:border-[#ff9b52] dark:hover:text-[#ffb276]"

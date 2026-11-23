@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
-
 import { RunConsoleDashboard } from "@/components/run-console-dashboard";
+import { firstOf } from "@/lib/db-helpers";
 import { requireServerSessionOrRedirect } from "@/lib/server-access";
 import type { DeploymentRow, ProjectRow, TaskRow } from "@/types/db";
 
@@ -73,7 +72,7 @@ export default async function ConsolePage() {
 
   const artifactCounts = (artifacts ?? []).reduce<Record<string, number>>(
     (accumulator, artifact) => {
-      const taskProject = Array.isArray(artifact.task) ? artifact.task[0] : artifact.task;
+      const taskProject = firstOf(artifact.task);
       if (!taskProject?.project_id) {
         return accumulator;
       }

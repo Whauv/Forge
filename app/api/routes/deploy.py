@@ -1,30 +1,25 @@
 from typing import Any
 
 from fastapi import APIRouter
-from pydantic import BaseModel, Field
 
 from app.agents.deploy_agent import DeployAgent
 from app.agents.feedback_agent import FeedbackAgent
+from app.api.schemas import DeployRequest
 from app.core.repo_utils import normalize_code_artifact_rows
 from app.db.supabase_client import (
     select_code_artifact_by_field,
     select_project_by_id,
     select_task_by_field,
-    select_task_by_id,
 )
+from app.services.pipeline import fetch_task, summarize_test_result
 
 router = APIRouter(prefix="/deploy", tags=["deploy"])
-
-
-class DeployRequest(BaseModel):
-    project_id: str = Field(..., min_length=1)
-    task_id: str = Field(..., min_length=1)
 
 
 @router.post("")
 async def deploy(payload: DeployRequest) -> dict[str, Any]:
     try:
-        task = await _fetch_task(payload.task_id)
+        task = await fetch_task(payload.task_id)
         if not task:
             return {"status": "error", "message": f"Task {payload.task_id} not found."}
 
@@ -52,7 +47,7 @@ async def deploy(payload: DeployRequest) -> dict[str, Any]:
                 "task_title": task.get("title") or "AI-FDE deployment",
                 "pain_points": (analysis or {}).get("pain_points"),
                 "proposed_solution": (analysis or {}).get("proposed_solution"),
-                "test_results_summary": _summarize_test_results(task.get("test_result")),
+                "test_results_summary": summarize_test_result(task.get("test_result")),
             }
         )
         if deploy_result.get("status") == "error":
@@ -79,17 +74,6 @@ async def deploy(payload: DeployRequest) -> dict[str, Any]:
         return {"status": "error", "message": str(exc)}
 
 
-async def _fetch_task(task_id: str) -> dict[str, Any] | None:
-    by_id = await select_task_by_id(task_id)
-    rows = getattr(by_id, "data", None) or []
-    if rows:
-        return rows[0]
-
-    by_task_id = await select_task_by_field("task_id", task_id)
-    rows = getattr(by_task_id, "data", None) or []
-    return rows[0] if rows else None
-
-
 async def _fetch_analysis(project_id: str) -> dict[str, Any] | None:
     response = await select_task_by_field("project_id", project_id)
     rows = getattr(response, "data", None) or []
@@ -103,13 +87,3 @@ async def _fetch_architect_tasks(project_id: str) -> list[dict[str, Any]]:
     response = await select_task_by_field("project_id", project_id)
     rows = getattr(response, "data", None) or []
     return [row for row in rows if row.get("task_id")]
-
-
-def _summarize_test_results(test_result: dict[str, Any] | None) -> str:
-    if not test_result:
-        return "No test results recorded."
-    return (
-        f"status={test_result.get('status')}; "
-        f"attempts={test_result.get('attempts')}; "
-        f"error={test_result.get('error')}"
-    )

@@ -24,5 +24,46 @@ dependencies = [
     "patch",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
 [tool.setuptools.packages.find]
 include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# "auto" lets plain `async def test_*` functions run without a per-test marker,
+# while existing unittest.TestCase tests continue to work unchanged.
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+# Kept at 0 for Phase 0 so CI measures coverage without blocking; raise as
+# characterization tests land in Phase 1.
+fail_under = 0
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["tests/**/__pycache__"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+# Phase 0 baseline: non-strict so the suite runs green; tighten per-module as
+# the refactor progresses.
+check_untyped_defs = false

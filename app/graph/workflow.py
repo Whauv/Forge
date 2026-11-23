@@ -1,8 +1,10 @@
+import functools
 import json
+from collections.abc import Awaitable, Callable
 from typing import Any, AsyncIterator, Literal
-from typing_extensions import NotRequired, TypedDict
 
 from langgraph.graph import END, StateGraph
+from typing_extensions import NotRequired, TypedDict
 
 from app.agents.analysis_agent import AnalysisAgent
 from app.agents.architect_agent import ArchitectAgent
@@ -11,6 +13,7 @@ from app.agents.deploy_agent import DeployAgent
 from app.agents.feedback_agent import FeedbackAgent
 from app.agents.ingest_agent import IngestAgent
 from app.agents.tester_agent import TesterAgent
+from app.services.pipeline import summarize_test_result as _summarize_test_result
 
 
 class AgentState(TypedDict):
@@ -29,148 +32,150 @@ class AgentState(TypedDict):
     raw_text: NotRequired[str]
 
 
-async def ingest_node(state: AgentState) -> AgentState:
-    try:
-        result = await IngestAgent().run(
-            {
-                "project_id": state["project_id"],
-                "repo_url": state.get("repo_url"),
-                "doc_urls": state.get("doc_urls"),
-                "raw_text": state.get("raw_text"),
-            }
-        )
-        if result.get("status") == "error":
-            return _with_error(state, result["message"])
-        return {**state, "status": "ingested", "error": None}
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
-async def analysis_node(state: AgentState) -> AgentState:
-    try:
-        result = await AnalysisAgent().run(
-            {"project_id": state["project_id"], "user_query": state["user_query"]}
-        )
-        if result.get("status") == "error":
-            return _with_error(state, result["message"])
-        return {**state, "analysis": result, "status": "analyzed", "error": None}
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
-async def architect_node(state: AgentState) -> AgentState:
-    try:
-        result = await ArchitectAgent().run(state["project_id"], state.get("analysis", {}))
-        if result.get("status") == "error":
-            return _with_error(state, result["message"])
-        task_graph = {**result, "approved_diffs": []}
-        return {
-            **state,
-            "task_graph": task_graph,
-            "current_task_index": 0,
-            "status": "architected",
-            "error": None,
-        }
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
-async def coder_node(state: AgentState) -> AgentState:
-    try:
-        current_task = _get_current_task(state)
-        if not current_task:
-            return _with_error(state, "No current task available for coder node.")
-
-        result = await CoderAgent().run(
-            {"project_id": state["project_id"], "task": current_task}
-        )
-        if result.get("status") == "error":
-            return _with_error(state, result["message"])
-
-        task_graph = dict(state.get("task_graph", {}))
-        approved_diffs = list(task_graph.get("approved_diffs", []))
-        approved_diffs.extend(result.get("diffs", []))
-        task_graph["approved_diffs"] = approved_diffs
-
-        return {
-            **state,
-            "current_diffs": result,
-            "task_graph": task_graph,
-            "status": "coded",
-            "error": None,
-        }
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
-async def tester_node(state: AgentState) -> AgentState:
-    try:
-        result = await TesterAgent().run(state.get("current_diffs", {}))
-        if result.get("status") == "failed":
-            return _with_error(state, result.get("error") or "Tester agent failed.")
-
-        next_state: AgentState = {
-            **state,
-            "test_result": result,
-            "status": result.get("status", "tested"),
-            "error": None,
-        }
-        if result.get("status") == "passed":
-            next_state["current_task_index"] = state.get("current_task_index", 0) + 1
-        return next_state
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
-async def deploy_node(state: AgentState) -> AgentState:
-    try:
-        tasks = state.get("task_graph", {}).get("tasks", [])
-        approved_diffs = state.get("task_graph", {}).get("approved_diffs", [])
-        current_task = tasks[-1] if tasks else {}
-        result = await DeployAgent().run(
-            {
-                "project_id": state["project_id"],
-                "repo_url": state.get("repo_url"),
-                "approved_diffs": approved_diffs,
-                "task_id": current_task.get("id"),
-                "task_title": current_task.get("title") or "AI-FDE deployment",
-                "pain_points": state.get("analysis", {}).get("pain_points"),
-                "proposed_solution": state.get("analysis", {}).get("proposed_solution"),
-                "test_results_summary": _summarize_test_result(state.get("test_result", {})),
-            }
-        )
-        if result.get("status") == "error":
-            return _with_error(state, result["message"])
-        return {
-            **state,
-            "deployment_result": result,
-            "status": "deployed",
-            "error": None,
-        }
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
-async def feedback_node(state: AgentState) -> AgentState:
-    try:
-        result = await FeedbackAgent().run(
-            {
-                "project_id": state["project_id"],
-                "analysis": state.get("analysis", {}),
-                "tasks": state.get("task_graph", {}).get("tasks", []),
-                "diffs": state.get("task_graph", {}).get("approved_diffs", []),
-                "test_results": state.get("test_result", {}),
-            }
-        )
-        if result.get("status") == "error":
-            return _with_error(state, result["message"])
-        return {**state, "status": "completed", "error": None}
-    except Exception as exc:
-        return _with_error(state, str(exc))
-
-
 def _with_error(state: AgentState, message: str) -> AgentState:
     return {**state, "status": "error", "error": message}
+
+
+NodeFn = Callable[[AgentState], Awaitable[AgentState]]
+
+
+def _safe_node(fn: NodeFn) -> NodeFn:
+    """Wrap a node so any unhandled exception becomes an error state."""
+
+    @functools.wraps(fn)
+    async def wrapper(state: AgentState) -> AgentState:
+        try:
+            return await fn(state)
+        except Exception as exc:
+            return _with_error(state, str(exc))
+
+    return wrapper
+
+
+@_safe_node
+async def ingest_node(state: AgentState) -> AgentState:
+    result = await IngestAgent().run(
+        {
+            "project_id": state["project_id"],
+            "repo_url": state.get("repo_url"),
+            "doc_urls": state.get("doc_urls"),
+            "raw_text": state.get("raw_text"),
+        }
+    )
+    if result.get("status") == "error":
+        return _with_error(state, result["message"])
+    return {**state, "status": "ingested", "error": None}
+
+
+@_safe_node
+async def analysis_node(state: AgentState) -> AgentState:
+    result = await AnalysisAgent().run(
+        {"project_id": state["project_id"], "user_query": state["user_query"]}
+    )
+    if result.get("status") == "error":
+        return _with_error(state, result["message"])
+    return {**state, "analysis": result, "status": "analyzed", "error": None}
+
+
+@_safe_node
+async def architect_node(state: AgentState) -> AgentState:
+    result = await ArchitectAgent().run(state["project_id"], state.get("analysis", {}))
+    if result.get("status") == "error":
+        return _with_error(state, result["message"])
+    task_graph = {**result, "approved_diffs": []}
+    return {
+        **state,
+        "task_graph": task_graph,
+        "current_task_index": 0,
+        "status": "architected",
+        "error": None,
+    }
+
+
+@_safe_node
+async def coder_node(state: AgentState) -> AgentState:
+    current_task = _get_current_task(state)
+    if not current_task:
+        return _with_error(state, "No current task available for coder node.")
+
+    result = await CoderAgent().run(
+        {"project_id": state["project_id"], "task": current_task}
+    )
+    if result.get("status") == "error":
+        return _with_error(state, result["message"])
+
+    task_graph = dict(state.get("task_graph", {}))
+    approved_diffs = list(task_graph.get("approved_diffs", []))
+    approved_diffs.extend(result.get("diffs", []))
+    task_graph["approved_diffs"] = approved_diffs
+
+    return {
+        **state,
+        "current_diffs": result,
+        "task_graph": task_graph,
+        "status": "coded",
+        "error": None,
+    }
+
+
+@_safe_node
+async def tester_node(state: AgentState) -> AgentState:
+    result = await TesterAgent().run(state.get("current_diffs", {}))
+    if result.get("status") == "failed":
+        return _with_error(state, result.get("error") or "Tester agent failed.")
+
+    next_state: AgentState = {
+        **state,
+        "test_result": result,
+        "status": result.get("status", "tested"),
+        "error": None,
+    }
+    if result.get("status") == "passed":
+        next_state["current_task_index"] = state.get("current_task_index", 0) + 1
+    return next_state
+
+
+@_safe_node
+async def deploy_node(state: AgentState) -> AgentState:
+    tasks = state.get("task_graph", {}).get("tasks", [])
+    approved_diffs = state.get("task_graph", {}).get("approved_diffs", [])
+    current_task = tasks[-1] if tasks else {}
+    result = await DeployAgent().run(
+        {
+            "project_id": state["project_id"],
+            "repo_url": state.get("repo_url"),
+            "approved_diffs": approved_diffs,
+            "task_id": current_task.get("id"),
+            "task_title": current_task.get("title") or "AI-FDE deployment",
+            "pain_points": state.get("analysis", {}).get("pain_points"),
+            "proposed_solution": state.get("analysis", {}).get("proposed_solution"),
+            "test_results_summary": _summarize_test_result(state.get("test_result", {})),
+        }
+    )
+    if result.get("status") == "error":
+        return _with_error(state, result["message"])
+    return {
+        **state,
+        "deployment_result": result,
+        "status": "deployed",
+        "error": None,
+    }
+
+
+@_safe_node
+async def feedback_node(state: AgentState) -> AgentState:
+    result = await FeedbackAgent().run(
+        {
+            "project_id": state["project_id"],
+            "analysis": state.get("analysis", {}),
+            "tasks": state.get("task_graph", {}).get("tasks", []),
+            "diffs": state.get("task_graph", {}).get("approved_diffs", []),
+            "test_results": state.get("test_result", {}),
+        }
+    )
+    if result.get("status") == "error":
+        return _with_error(state, result["message"])
+    return {**state, "status": "completed", "error": None}
 
 
 def _get_current_task(state: AgentState) -> dict[str, Any] | None:
@@ -241,6 +246,12 @@ def build_workflow():
     return graph.compile()
 
 
+@functools.lru_cache(maxsize=1)
+def get_compiled_workflow():
+    """Compile the LangGraph once and reuse it across requests."""
+    return build_workflow()
+
+
 async def run_workflow(input_payload: dict[str, Any]) -> AsyncIterator[str]:
     initial_state: AgentState = {
         "project_id": input_payload.get("project_id", ""),
@@ -260,16 +271,6 @@ async def run_workflow(input_payload: dict[str, Any]) -> AsyncIterator[str]:
     if "raw_text" in input_payload:
         initial_state["raw_text"] = input_payload["raw_text"]
 
-    graph = build_workflow()
+    graph = get_compiled_workflow()
     async for update in graph.astream(initial_state, stream_mode="updates"):
         yield json.dumps(update, default=str)
-
-
-def _summarize_test_result(test_result: dict[str, Any]) -> str:
-    if not test_result:
-        return "No test results recorded."
-    return (
-        f"status={test_result.get('status')}; "
-        f"attempts={test_result.get('attempts')}; "
-        f"error={test_result.get('error')}"
-    )

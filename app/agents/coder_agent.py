@@ -1,12 +1,10 @@
-import asyncio
 import json
 from typing import Any
 from uuid import uuid4
 
-import google.generativeai as genai
 from pydantic import BaseModel, ValidationError
 
-from app.core.config import get_required_env
+from app.agents.utils import embed_text, generate_text
 from app.core.json_stream import extract_json_object
 from app.db.qdrant_client import search_vectors
 from app.db.supabase_client import insert_code_artifact
@@ -50,16 +48,12 @@ class CoderResult(BaseModel):
 
 
 class CoderAgent:
-    def __init__(self) -> None:
-        genai.configure(api_key=get_required_env("GEMINI_API_KEY"))
-        self.model = genai.GenerativeModel("gemini-2.0-flash")
-
     async def run(self, payload: dict[str, Any]) -> dict[str, Any]:
         try:
             project_id = payload["project_id"]
             task = payload["task"]
             prompt = await self._build_prompt(project_id, task, payload.get("error_context"))
-            response_text = await asyncio.to_thread(self._generate_response, prompt)
+            response_text = await generate_text(prompt)
             parsed = self._parse_and_validate(response_text)
             await self._save_diffs(project_id, task, parsed)
             return {
@@ -84,7 +78,9 @@ class CoderAgent:
 
         task_description = task.get("description") or task.get("title") or json.dumps(task)
         if error_context:
-            task_description = f"{task_description}\n\nPrevious test failure to address:\n{error_context}"
+            task_description = (
+                f"{task_description}\n\nPrevious test failure to address:\n{error_context}"
+            )
 
         return CODER_PROMPT.format(
             task_description=task_description,
@@ -118,25 +114,7 @@ class CoderAgent:
         return selected
 
     async def _embed_query(self, query: str) -> list[float]:
-        def _embed() -> list[float]:
-            response = genai.embed_content(
-                model="models/text-embedding-004",
-                content=query,
-                task_type="retrieval_query",
-            )
-            embedding = response.get("embedding")
-            if not embedding:
-                raise ValueError("Failed to embed coder query.")
-            return embedding
-
-        return await asyncio.to_thread(_embed)
-
-    def _generate_response(self, prompt: str) -> str:
-        response = self.model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"},
-        )
-        return getattr(response, "text", "") or ""
+        return await embed_text(query, task_type="RETRIEVAL_QUERY")
 
     def _parse_and_validate(self, response_text: str) -> dict[str, Any]:
         try:

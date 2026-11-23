@@ -3,10 +3,9 @@ import json
 from typing import Any
 from uuid import uuid4
 
-import google.generativeai as genai
 from pydantic import BaseModel, Field, ValidationError
 
-from app.core.config import get_required_env
+from app.agents.utils import embed_text, generate_text, get_model
 from app.core.json_stream import (
     extract_array_field,
     extract_json_object,
@@ -47,15 +46,14 @@ class AnalysisResult(BaseModel):
 
 class AnalysisAgent:
     def __init__(self) -> None:
-        genai.configure(api_key=get_required_env("GEMINI_API_KEY"))
-        self.analysis_model = genai.GenerativeModel("gemini-2.0-flash")
+        self.analysis_model = get_model()
 
     async def run(self, payload: dict[str, str]) -> dict[str, Any]:
         try:
             project_id = payload["project_id"]
             user_query = payload["user_query"]
             prompt = await self._build_prompt(project_id, user_query)
-            response_text = await asyncio.to_thread(self._generate_response, prompt)
+            response_text = await generate_text(prompt)
             parsed = self._parse_and_validate(response_text)
             await self._save_analysis(project_id, user_query, parsed)
             return parsed
@@ -101,18 +99,7 @@ class AnalysisAgent:
         )
 
     async def _embed_query(self, user_query: str) -> list[float]:
-        def _embed() -> list[float]:
-            response = genai.embed_content(
-                model="models/text-embedding-004",
-                content=user_query,
-                task_type="retrieval_query",
-            )
-            embedding = response.get("embedding")
-            if not embedding:
-                raise ValueError("Failed to embed user query.")
-            return embedding
-
-        return await asyncio.to_thread(_embed)
+        return await embed_text(user_query, task_type="RETRIEVAL_QUERY")
 
     async def _find_similar_template(self, query_vector: list[float]) -> str:
         try:
@@ -150,13 +137,6 @@ class AnalysisAgent:
                 )
             )
         return "\n\n".join(formatted_chunks) or "No relevant context retrieved."
-
-    def _generate_response(self, prompt: str) -> str:
-        response = self.analysis_model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"},
-        )
-        return getattr(response, "text", "") or ""
 
     def _parse_and_validate(self, response_text: str) -> dict[str, Any]:
         try:

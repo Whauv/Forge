@@ -1,12 +1,11 @@
 import asyncio
-import json
-import re
 from collections.abc import Sequence
 from typing import Any
 
 import google.generativeai as genai
 
 from app.core.config import get_required_env
+from app.core.json_stream import extract_json_object
 
 EMBED_MODEL = "models/text-embedding-004"
 CHAT_MODEL = "gemini-2.0-flash"
@@ -14,6 +13,12 @@ CHAT_MODEL = "gemini-2.0-flash"
 
 def _configure_gemini() -> None:
     genai.configure(api_key=get_required_env("GEMINI_API_KEY"))
+
+
+def get_model(model_name: str = CHAT_MODEL) -> "genai.GenerativeModel":
+    """Configure Gemini and return a chat model (used for one-shot + streaming)."""
+    _configure_gemini()
+    return genai.GenerativeModel(model_name)
 
 
 def _extract_response_text(response: Any) -> str:
@@ -33,11 +38,18 @@ def _extract_response_text(response: Any) -> str:
 
 
 def parse_json_payload(text: str) -> dict[str, Any]:
-    cleaned = text.strip()
-    cleaned = re.sub(r"^```json\s*", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"^```\s*", "", cleaned)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
-    return json.loads(cleaned)
+    # Single JSON extractor shared with the agents (fences + object extraction).
+    return extract_json_object(text)
+
+
+def _embedding_from_response(response: Any) -> list[float]:
+    if isinstance(response, dict):
+        embedding = list(response.get("embedding", []))
+    else:
+        embedding = list(getattr(response, "embedding", []) or [])
+    if not embedding:
+        raise ValueError("Gemini returned an empty embedding.")
+    return embedding
 
 
 async def embed_text(
@@ -52,9 +64,7 @@ async def embed_text(
             content=text,
             task_type=task_type,
         )
-        if isinstance(response, dict):
-            return list(response.get("embedding", []))
-        return list(getattr(response, "embedding", []) or [])
+        return _embedding_from_response(response)
 
     return await asyncio.to_thread(_embed)
 
@@ -66,31 +76,34 @@ async def embed_texts(
 ) -> list[list[float]]:
     def _embed_many() -> list[list[float]]:
         _configure_gemini()
-        results: list[list[float]] = []
-        for item in texts:
-            response = genai.embed_content(
-                model=EMBED_MODEL,
-                content=item,
-                task_type=task_type,
+        return [
+            _embedding_from_response(
+                genai.embed_content(model=EMBED_MODEL, content=item, task_type=task_type)
             )
-            if isinstance(response, dict):
-                results.append(list(response.get("embedding", [])))
-            else:
-                results.append(list(getattr(response, "embedding", []) or []))
-        return results
+            for item in texts
+        ]
 
     return await asyncio.to_thread(_embed_many)
 
 
-async def generate_json(prompt: str) -> dict[str, Any]:
-    def _generate() -> dict[str, Any]:
-        _configure_gemini()
-        model = genai.GenerativeModel(CHAT_MODEL)
+async def generate_text(prompt: str) -> str:
+    """Run a one-shot JSON-mode generation and return the raw response text.
+
+    Callers that need their own validation / error messages parse this text
+    themselves (e.g. via ``extract_json_object`` + a pydantic model).
+    """
+
+    def _generate() -> str:
+        model = get_model()
         response = model.generate_content(
             prompt,
             generation_config={"response_mime_type": "application/json"},
         )
-        return parse_json_payload(_extract_response_text(response))
+        return _extract_response_text(response)
 
     return await asyncio.to_thread(_generate)
+
+
+async def generate_json(prompt: str) -> dict[str, Any]:
+    return parse_json_payload(await generate_text(prompt))
 

@@ -3,10 +3,9 @@ import json
 from typing import Any
 from uuid import uuid4
 
-import google.generativeai as genai
 from pydantic import BaseModel, ValidationError
 
-from app.core.config import get_required_env
+from app.agents.utils import generate_text, get_model
 from app.core.json_stream import extract_array_field, extract_json_object
 from app.db.supabase_client import insert_task
 
@@ -46,13 +45,12 @@ class ArchitectResult(BaseModel):
 
 class ArchitectAgent:
     def __init__(self) -> None:
-        genai.configure(api_key=get_required_env("GEMINI_API_KEY"))
-        self.architect_model = genai.GenerativeModel("gemini-2.0-flash")
+        self.architect_model = get_model()
 
     async def run(self, project_id: str, analysis: dict[str, Any]) -> dict[str, Any]:
         try:
             prompt = self._build_prompt(analysis)
-            response_text = await asyncio.to_thread(self._generate_response, prompt)
+            response_text = await generate_text(prompt)
             parsed = self._parse_and_validate(response_text)
             await self._save_tasks(project_id, parsed["tasks"])
             return parsed
@@ -89,13 +87,6 @@ class ArchitectAgent:
         return ARCHITECT_PROMPT.format(
             analysis_json=json.dumps(analysis, indent=2),
         )
-
-    def _generate_response(self, prompt: str) -> str:
-        response = self.architect_model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"},
-        )
-        return getattr(response, "text", "") or ""
 
     def _parse_and_validate(self, response_text: str) -> dict[str, Any]:
         try:

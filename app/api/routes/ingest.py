@@ -1,18 +1,11 @@
 from typing import Any
 
 from fastapi import APIRouter
-from pydantic import BaseModel, Field
 
 from app.agents.ingest_agent import IngestAgent
+from app.api.schemas import IngestRequest
 
 router = APIRouter(prefix="/ingest", tags=["ingest"])
-
-
-class IngestRequest(BaseModel):
-    project_id: str = Field(..., min_length=1)
-    repo_url: str | None = None
-    doc_urls: list[str] | None = None
-    raw_text: str | None = None
 
 
 @router.post("")
