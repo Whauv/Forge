@@ -1,5 +1,6 @@
 """Characterization tests for DeployAgent.run (GitHub client mocked)."""
 
+import re
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -8,6 +9,7 @@ from app.agents.deploy_agent import DeployAgent
 
 def _configure_repo() -> MagicMock:
     repo = MagicMock(name="repo")
+    repo.default_branch = "develop"
     repo.get_branch.return_value.commit.sha = "basesha"
     # Force the "file does not exist" path so create_file is used.
     repo.get_contents.side_effect = Exception("not found")
@@ -33,12 +35,14 @@ async def test_run_creates_pr_and_returns_links(mock_supabase):
 
     result = await agent.run(payload)
 
-    assert result == {
-        "pr_url": "https://github.com/x/pr/1",
-        "branch": "ai-fde/proj1234",
-        "commit_sha": "commit-1",
-    }
+    assert result["pr_url"] == "https://github.com/x/pr/1"
+    assert result["commit_sha"] == "commit-1"
+    # Branch is unique per run: "ai-fde/<project[:8]>-<suffix>".
+    assert re.fullmatch(r"ai-fde/proj1234-[0-9a-f]{8}", result["branch"])
+
     repo.create_pull.assert_called_once()
+    # PR is opened against the repo's real default branch, not hardcoded "main".
+    assert repo.create_pull.call_args.kwargs["base"] == "develop"
     mock_supabase.table.assert_any_call("deployments")
 
 

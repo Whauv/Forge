@@ -23,8 +23,11 @@ class DeployAgent:
             repo = await asyncio.to_thread(
                 self.github_client.get_repo, parse_github_repo_name(repo_url)
             )
-            branch_name = f"ai-fde/{project_id[:8]}"
-            base_branch = await asyncio.to_thread(repo.get_branch, "main")
+            base_branch_name = repo.default_branch or "main"
+            # Unique per run so re-deploying a project does not collide with an
+            # existing branch (which would fail branch/PR creation).
+            branch_name = f"ai-fde/{project_id[:8]}-{uuid4().hex[:8]}"
+            base_branch = await asyncio.to_thread(repo.get_branch, base_branch_name)
             await self._ensure_branch(repo, branch_name, base_branch.commit.sha)
             commit_sha = base_branch.commit.sha
 
@@ -40,7 +43,7 @@ class DeployAgent:
                 repo.create_pull,
                 title=payload.get("task_title", "AI-FDE generated update"),
                 body=self._build_pr_body(payload),
-                base="main",
+                base=base_branch_name,
                 head=branch_name,
             )
 

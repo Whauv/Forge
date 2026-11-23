@@ -12,10 +12,13 @@ from app.graph.workflow import run_workflow
 
 app = FastAPI(title="AI Forward Deployed Engineer")
 
+# A wildcard origin cannot be combined with credentialed requests per the CORS
+# spec (browsers reject it). The frontend calls this API server-to-server, so no
+# browser credentials are needed; keep the open origin and disable credentials.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
