@@ -40,6 +40,50 @@ class RepoUtilsTests(unittest.TestCase):
             ],
         )
 
+    # --- edge / error paths ---------------------------------------------------
+
+    def test_parse_github_repo_name_without_git_suffix(self) -> None:
+        self.assertEqual(
+            parse_github_repo_name("https://github.com/Whauv/Forge"),
+            "Whauv/Forge",
+        )
+
+    def test_parse_github_repo_name_ignores_extra_path_segments(self) -> None:
+        self.assertEqual(
+            parse_github_repo_name("https://github.com/acme/widget/tree/main/src"),
+            "acme/widget",
+        )
+
+    def test_parse_github_repo_name_requires_owner_and_repo(self) -> None:
+        with self.assertRaises(ValueError):
+            parse_github_repo_name("https://github.com/acme")
+
+    def test_parse_github_repo_name_empty_path_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            parse_github_repo_name("https://github.com/")
+
+    def test_infer_project_name_replaces_separators_and_titles(self) -> None:
+        self.assertEqual(
+            infer_project_name("https://github.com/acme/my-cool_repo.git"),
+            "My Cool Repo",
+        )
+
+    def test_normalize_code_artifact_rows_empty_list(self) -> None:
+        self.assertEqual(normalize_code_artifact_rows([]), [])
+
+    def test_normalize_code_artifact_rows_missing_keys_default_to_empty(self) -> None:
+        self.assertEqual(
+            normalize_code_artifact_rows([{}]),
+            [{"file_path": "", "diff": "", "explanation": ""}],
+        )
+
+    def test_normalize_code_artifact_rows_none_values_coerced(self) -> None:
+        rows = [{"file_path": None, "unified_diff": None, "explanation": None}]
+        self.assertEqual(
+            normalize_code_artifact_rows(rows),
+            [{"file_path": "", "diff": "", "explanation": ""}],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

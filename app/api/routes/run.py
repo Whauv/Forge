@@ -1,29 +1,23 @@
 from typing import Any
 
 from fastapi import APIRouter
-from pydantic import BaseModel, Field
 
 from app.agents.coder_agent import CoderAgent
 from app.agents.tester_agent import TesterAgent
+from app.api.schemas import RunRequest
 from app.db.supabase_client import (
     broadcast_project_update,
-    select_task_by_field,
-    select_task_by_id,
     update_task_by_id,
 )
+from app.services.pipeline import fetch_task
 
 router = APIRouter(prefix="/run", tags=["run"])
-
-
-class RunRequest(BaseModel):
-    project_id: str = Field(..., min_length=1)
-    task_id: str = Field(..., min_length=1)
 
 
 @router.post("")
 async def run(payload: RunRequest) -> dict[str, Any]:
     try:
-        task = await _fetch_task(payload.task_id)
+        task = await fetch_task(payload.task_id)
         if not task:
             return {"status": "error", "message": f"Task {payload.task_id} not found."}
 
@@ -64,7 +58,8 @@ async def run(payload: RunRequest) -> dict[str, Any]:
         )
         tester_result = await TesterAgent().run(coder_result)
 
-        task_status = "completed" if tester_result["status"] == "passed" else "needs_human_review"
+        tester_status = tester_result.get("status")
+        task_status = "completed" if tester_status == "passed" else "needs_human_review"
         await update_task_by_id(
             task["id"],
             {"status": task_status, "test_result": tester_result},
@@ -74,22 +69,11 @@ async def run(payload: RunRequest) -> dict[str, Any]:
             "run_status",
             {
                 "stage": "tester",
-                "status": tester_result["status"],
+                "status": tester_status,
                 "task_id": payload.task_id,
-                "attempts": tester_result["attempts"],
+                "attempts": tester_result.get("attempts"),
             },
         )
         return tester_result
     except Exception as exc:
         return {"status": "error", "message": str(exc)}
-
-
-async def _fetch_task(task_id: str) -> dict[str, Any] | None:
-    by_id = await select_task_by_id(task_id)
-    rows = getattr(by_id, "data", None) or []
-    if rows:
-        return rows[0]
-
-    by_task_id = await select_task_by_field("task_id", task_id)
-    rows = getattr(by_task_id, "data", None) or []
-    return rows[0] if rows else None

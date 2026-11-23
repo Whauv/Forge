@@ -20,7 +20,9 @@ class DeployAgent:
             repo_url = payload.get("repo_url")
             if not repo_url:
                 raise ValueError("repo_url is required for deployment.")
-            repo = await asyncio.to_thread(self.github_client.get_repo, parse_github_repo_name(repo_url))
+            repo = await asyncio.to_thread(
+                self.github_client.get_repo, parse_github_repo_name(repo_url)
+            )
             branch_name = f"ai-fde/{project_id[:8]}"
             base_branch = await asyncio.to_thread(repo.get_branch, "main")
             await self._ensure_branch(repo, branch_name, base_branch.commit.sha)
@@ -104,7 +106,9 @@ class DeployAgent:
         )
         return updated["commit"].sha
 
-    async def _get_file(self, repo: Any, file_path: str, branch_name: str) -> tuple[Any | None, str]:
+    async def _get_file(
+        self, repo: Any, file_path: str, branch_name: str
+    ) -> tuple[Any | None, str]:
         def _load() -> tuple[Any | None, str]:
             try:
                 file_ref = repo.get_contents(file_path, ref=branch_name)
@@ -148,7 +152,11 @@ class DeployAgent:
 
     def _extract_new_file_content(self, diff_text: str) -> str | None:
         lines = diff_text.splitlines()
-        plus_lines = [line[1:] for line in lines if line.startswith("+") and not line.startswith("+++")]
+        plus_lines = [
+            line[1:]
+            for line in lines
+            if line.startswith("+") and not line.startswith("+++")
+        ]
         if plus_lines:
             return "\n".join(plus_lines) + ("\n" if diff_text.endswith("\n") else "")
         return None

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
-
+import { deploymentStatusBadgeClasses } from "@/lib/deployment-status";
+import { firstOf } from "@/lib/db-helpers";
 import { requireServerSessionOrRedirect } from "@/lib/server-access";
 import type { DeploymentRow } from "@/types/db";
 
@@ -12,27 +12,8 @@ type HistoryDeployment = Pick<
 
 export const dynamic = "force-dynamic";
 
-function statusClasses(status: string | null) {
-  switch (status) {
-    case "deployed":
-    case "passed":
-      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300";
-    case "failed":
-      return "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300";
-    case "testing":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300";
-    case "coding":
-      return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300";
-    default:
-      return "bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300";
-  }
-}
-
 function getProjectName(project: HistoryDeployment["project"]) {
-  if (Array.isArray(project)) {
-    return project[0]?.name ?? "Unknown project";
-  }
-  return project?.name ?? "Unknown project";
+  return firstOf(project)?.name ?? "Unknown project";
 }
 
 export default async function HistoryPage() {
@@ -86,7 +67,7 @@ export default async function HistoryPage() {
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${statusClasses(
+                        className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${deploymentStatusBadgeClasses(
                           deployment.status,
                         )}`}
                       >

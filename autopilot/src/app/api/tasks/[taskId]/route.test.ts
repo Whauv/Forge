@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -105,5 +106,62 @@ describe("PATCH /api/tasks/[taskId]", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ status: "approved" });
+  });
+
+  it("returns 400 for an invalid status value", async () => {
+    const response = await PATCH(
+      new Request("http://localhost/api/tasks/task-1", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "sideways" }),
+      }),
+      { params: { taskId: "task-1" } },
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: "Invalid task status." });
+  });
+
+  it("returns 500 when the ownership fetch errors", async () => {
+    const supabase = createTaskSupabase({ task: null, fetchError: { message: "db down" } });
+    vi.mocked(requireRouteSession).mockResolvedValue({
+      supabase: supabase as never,
+      userId: "user-123",
+    });
+
+    const response = await PATCH(
+      new Request("http://localhost/api/tasks/task-1", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "approved" }),
+      }),
+      { params: { taskId: "task-1" } },
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: "db down" });
+  });
+
+  it("returns 500 when the update errors", async () => {
+    const supabase = createTaskSupabase({
+      task: { id: "task-1" },
+      updateError: { message: "write failed" },
+    });
+    vi.mocked(requireRouteSession).mockResolvedValue({
+      supabase: supabase as never,
+      userId: "user-123",
+    });
+
+    const response = await PATCH(
+      new Request("http://localhost/api/tasks/task-1", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "rejected" }),
+      }),
+      { params: { taskId: "task-1" } },
+    );
+
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({ error: "write failed" });
   });
 });

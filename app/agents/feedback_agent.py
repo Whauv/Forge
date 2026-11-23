@@ -1,11 +1,8 @@
-import asyncio
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-import google.generativeai as genai
-
-from app.core.config import get_required_env
+from app.agents.utils import embed_text
 from app.db.qdrant_client import (
     create_solution_template_collection,
     upsert_vectors_for_collection,
@@ -13,9 +10,6 @@ from app.db.qdrant_client import (
 
 
 class FeedbackAgent:
-    def __init__(self) -> None:
-        genai.configure(api_key=get_required_env("GEMINI_API_KEY"))
-
     async def run(self, project_record: dict[str, Any]) -> dict[str, Any]:
         try:
             template = self._build_template(project_record)
@@ -86,15 +80,4 @@ class FeedbackAgent:
         return sorted(stack)
 
     async def _embed_summary(self, solution_summary: str) -> list[float]:
-        def _embed() -> list[float]:
-            response = genai.embed_content(
-                model="models/text-embedding-004",
-                content=solution_summary,
-                task_type="retrieval_document",
-            )
-            embedding = response.get("embedding")
-            if not embedding:
-                raise ValueError("Failed to embed solution summary.")
-            return embedding
-
-        return await asyncio.to_thread(_embed)
+        return await embed_text(solution_summary, task_type="RETRIEVAL_DOCUMENT")

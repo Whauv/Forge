@@ -196,7 +196,9 @@ except Exception as exc:
 
     def _build_test_script(self, test_code: str) -> str:
         language = self._detect_test_language(test_code)
-        third_party_imports = self._extract_python_packages(test_code) if language == "python" else []
+        third_party_imports = (
+            self._extract_python_packages(test_code) if language == "python" else []
+        )
         return f"""
 import contextlib
 import io
@@ -275,7 +277,11 @@ except Exception as exc:
 
     def _detect_test_language(self, test_code: str) -> str:
         javascript_markers = ("console.log(", "require(", "module.exports", "describe(", "it(")
-        return "javascript" if any(marker in test_code for marker in javascript_markers) else "python"
+        return (
+            "javascript"
+            if any(marker in test_code for marker in javascript_markers)
+            else "python"
+        )
 
     def _extract_python_packages(self, test_code: str) -> list[str]:
         import re

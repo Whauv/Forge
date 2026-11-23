@@ -27,6 +27,7 @@ export interface Database {
           github_repo_url: string;
           doc_urls: string[] | null;
           problem_description: string | null;
+          status: string | null;
           created_at: string;
         };
         Insert: {
@@ -36,6 +37,7 @@ export interface Database {
           github_repo_url: string;
           doc_urls?: string[] | null;
           problem_description?: string | null;
+          status?: string | null;
           created_at?: string;
         };
         Update: {
@@ -45,6 +47,7 @@ export interface Database {
           github_repo_url?: string;
           doc_urls?: string[] | null;
           problem_description?: string | null;
+          status?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -57,6 +60,12 @@ export interface Database {
           description: string | null;
           status: TaskStatus | null;
           clarifying_question: string | null;
+          task_id: string | null;
+          type: string | null;
+          files_to_modify: string[] | null;
+          depends_on: string[] | null;
+          details: Json | null;
+          test_result: Json | null;
           created_at: string;
         };
         Insert: {
@@ -66,6 +75,12 @@ export interface Database {
           description?: string | null;
           status?: TaskStatus | null;
           clarifying_question?: string | null;
+          task_id?: string | null;
+          type?: string | null;
+          files_to_modify?: string[] | null;
+          depends_on?: string[] | null;
+          details?: Json | null;
+          test_result?: Json | null;
           created_at?: string;
         };
         Update: {
@@ -75,6 +90,12 @@ export interface Database {
           description?: string | null;
           status?: TaskStatus | null;
           clarifying_question?: string | null;
+          task_id?: string | null;
+          type?: string | null;
+          files_to_modify?: string[] | null;
+          depends_on?: string[] | null;
+          details?: Json | null;
+          test_result?: Json | null;
           created_at?: string;
         };
         Relationships: [];
@@ -83,22 +104,31 @@ export interface Database {
         Row: {
           id: string;
           task_id: string | null;
+          project_id: string | null;
           file_path: string;
           unified_diff: string;
+          explanation: string | null;
+          status: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           task_id?: string | null;
+          project_id?: string | null;
           file_path: string;
           unified_diff: string;
+          explanation?: string | null;
+          status?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           task_id?: string | null;
+          project_id?: string | null;
           file_path?: string;
           unified_diff?: string;
+          explanation?: string | null;
+          status?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -107,6 +137,7 @@ export interface Database {
         Row: {
           id: string;
           project_id: string | null;
+          task_id: string | null;
           status: DeploymentStatus | null;
           pr_link: string | null;
           branch_name: string | null;
@@ -118,6 +149,7 @@ export interface Database {
         Insert: {
           id?: string;
           project_id?: string | null;
+          task_id?: string | null;
           status?: DeploymentStatus | null;
           pr_link?: string | null;
           branch_name?: string | null;
@@ -129,6 +161,7 @@ export interface Database {
         Update: {
           id?: string;
           project_id?: string | null;
+          task_id?: string | null;
           status?: DeploymentStatus | null;
           pr_link?: string | null;
           branch_name?: string | null;

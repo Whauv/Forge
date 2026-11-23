@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendPRCreatedEmail } from "@/lib/email";
+import { errorMessage, jsonError } from "@/lib/route-helpers";
 import { requireRouteSession } from "@/lib/server-access";
 import type { DeploymentRow } from "@/types/db";
 
@@ -31,17 +32,11 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
       .maybeSingle();
 
     if (fetchError || !deployment) {
-      return NextResponse.json(
-        { error: fetchError?.message ?? "Deployment not found." },
-        { status: 404 },
-      );
+      return jsonError(fetchError?.message ?? "Deployment not found.", 404);
     }
 
     if (deployment.status !== "passed") {
-      return NextResponse.json(
-        { error: "Only passed deployments can proceed." },
-        { status: 400 },
-      );
+      return jsonError("Only passed deployments can proceed.", 400);
     }
 
     const { error: updateError } = await supabase
@@ -50,7 +45,7 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
       .eq("id", params.deploymentId);
 
     if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
+      return jsonError(updateError.message, 500);
     }
 
     const {
@@ -63,14 +58,6 @@ export async function POST(request: Request, { params }: ProceedRouteProps) {
 
     return NextResponse.json({ status: "deployed" });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unexpected deployment proceed error.",
-      },
-      { status: 500 },
-    );
+    return jsonError(errorMessage(error, "Unexpected deployment proceed error."), 500);
   }
 }

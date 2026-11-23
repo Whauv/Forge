@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 
 
 class StatusResponse(BaseModel):
@@ -7,9 +7,9 @@ class StatusResponse(BaseModel):
 
 
 class IngestRequest(BaseModel):
-    project_id: str | None = None
-    repo_url: HttpUrl | None = None
-    doc_urls: list[HttpUrl] = Field(default_factory=list)
+    project_id: str = Field(..., min_length=1)
+    repo_url: str | None = None
+    doc_urls: list[str] | None = None
     raw_text: str | None = None
 
 
@@ -19,10 +19,18 @@ class AnalyzeRequest(BaseModel):
 
 
 class RunRequest(BaseModel):
-    project_id: str
-    task_id: str
+    project_id: str = Field(..., min_length=1)
+    task_id: str = Field(..., min_length=1)
 
 
 class DeployRequest(BaseModel):
-    project_id: str
-    task_id: str
+    project_id: str = Field(..., min_length=1)
+    task_id: str = Field(..., min_length=1)
+
+
+class WorkflowRequest(BaseModel):
+    project_id: str = Field(..., min_length=1)
+    repo_url: str | None = None
+    user_query: str | None = None
+    doc_urls: list[str] | None = None
+    raw_text: str | None = None

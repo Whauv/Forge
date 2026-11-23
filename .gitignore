@@ -2,6 +2,11 @@
 .env.local
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
 .venv/
 venv/
 __pycache__/
